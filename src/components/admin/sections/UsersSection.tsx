@@ -1,77 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     IconButton, Menu, MenuItem, Chip, Avatar, Typography, Tooltip, Stack,
-    TextField, InputAdornment, Button, Divider
+    TextField, InputAdornment, Button, Divider, CircularProgress
 } from '@mui/material';
 import {
     MoreVertical, Eye, Edit, Ban, Trash2, Key, Shield, Search, Filter, Plus
 } from 'lucide-react';
 
 interface User {
-    id: string;
+    _id: string; // MongoDB ID
     name: string;
     email: string;
-    phone: string;
-    role: 'User' | 'Admin' | 'Moderator';
-    status: 'Active' | 'Blocked' | 'Pending';
+    role: 'user' | 'admin';
     createdAt: string;
+    // UI only fields (optional or derived)
+    phone?: string;
+    status?: string;
     avatar?: string;
 }
-
-const MOCK_USERS: User[] = [
-    {
-        id: 'USR-001',
-        name: 'Atharv G',
-        email: 'atharv@example.com',
-        phone: '+91 98765 43210',
-        role: 'Admin',
-        status: 'Active',
-        createdAt: '2024-01-15',
-        avatar: '/avatars/1.jpg'
-    },
-    {
-        id: 'USR-002',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+1 234 567 8900',
-        role: 'User',
-        status: 'Active',
-        createdAt: '2024-02-10'
-    },
-    {
-        id: 'USR-003',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: '+1 987 654 3210',
-        role: 'Moderator',
-        status: 'Pending',
-        createdAt: '2024-03-05'
-    },
-    {
-        id: 'USR-004',
-        name: 'Mike Johnson',
-        email: 'mike@example.com',
-        phone: '+1 555 123 4567',
-        role: 'User',
-        status: 'Blocked',
-        createdAt: '2024-03-20'
-    },
-    {
-        id: 'USR-005',
-        name: 'Sarah Wilson',
-        email: 'sarah@example.com',
-        phone: '+1 444 987 6543',
-        role: 'User',
-        status: 'Active',
-        createdAt: '2024-01-20'
-    }
-];
 
 export default function UsersSection() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsers(data.users || []);
+                } else {
+                    console.error('Failed to fetch users');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
         setAnchorEl(event.currentTarget);
@@ -88,17 +62,23 @@ export default function UsersSection() {
             case 'Active': return 'success';
             case 'Blocked': return 'error';
             case 'Pending': return 'warning';
-            default: return 'default';
+            default: return 'success'; // Default to success/active for now
         }
     };
 
     const getRoleColor = (role: string) => {
         switch (role) {
-            case 'Admin': return 'primary.main';
-            case 'Moderator': return 'secondary.main';
+            case 'admin': return 'primary.main';
+            case 'user': return 'text.secondary';
             default: return 'text.secondary';
         }
     };
+
+    // Filter users
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <Stack spacing={3}>
@@ -141,70 +121,83 @@ export default function UsersSection() {
             {/* Users Table */}
             <Paper elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <TableContainer>
-                    <Table>
-                        <TableHead sx={{ bgcolor: '#f8fafc' }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>User</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Contact</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Role</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Status</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Created</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {MOCK_USERS.map((user) => (
-                                <TableRow key={user.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell>
-                                        <Box display="flex" alignItems="center" gap={2}>
-                                            <Avatar src={user.avatar} alt={user.name}>
-                                                {user.name.charAt(0)}
-                                            </Avatar>
-                                            <Box>
-                                                <Typography variant="subtitle2" fontWeight={600}>
-                                                    {user.name}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {user.id}
+                    {loading ? (
+                        <Box display="flex" justifyContent="center" p={4}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <Table>
+                            <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>User</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Contact</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Role</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Created</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredUsers.map((user) => (
+                                    <TableRow key={user._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                        <TableCell>
+                                            <Box display="flex" alignItems="center" gap={2}>
+                                                <Avatar src={user.avatar} alt={user.name}>
+                                                    {user.name.charAt(0)}
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography variant="subtitle2" fontWeight={600}>
+                                                        {user.name}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {user._id}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2">{user.email}</Typography>
+                                            <Typography variant="caption" color="text.secondary">{user.phone || 'N/A'}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <Shield size={14} color={user.role === 'admin' ? '#6366f1' : '#94a3b8'} />
+                                                <Typography variant="body2" fontWeight={500} color={getRoleColor(user.role)}>
+                                                    {user.role}
                                                 </Typography>
                                             </Box>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{user.email}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{user.phone}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <Shield size={14} color={user.role === 'Admin' ? '#6366f1' : '#94a3b8'} />
-                                            <Typography variant="body2" fontWeight={500} color={getRoleColor(user.role)}>
-                                                {user.role}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={user.status || 'Active'}
+                                                size="small"
+                                                color={getStatusColor(user.status || 'Active') as any}
+                                                variant="outlined"
+                                                sx={{ fontWeight: 500, borderRadius: '6px' }}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {new Date(user.createdAt).toLocaleDateString()}
                                             </Typography>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label={user.status}
-                                            size="small"
-                                            color={getStatusColor(user.status) as any}
-                                            variant="outlined"
-                                            sx={{ fontWeight: 500, borderRadius: '6px' }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {user.createdAt}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, user)}>
-                                            <MoreVertical size={18} />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <IconButton size="small" onClick={(e) => handleMenuOpen(e, user)}>
+                                                <MoreVertical size={18} />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {filteredUsers.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                                            <Typography color="text.secondary">No users found</Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                 </TableContainer>
             </Paper>
 

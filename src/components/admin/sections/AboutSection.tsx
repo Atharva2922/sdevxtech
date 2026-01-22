@@ -10,8 +10,8 @@ interface AboutSectionProps {
 export default function AboutSection({ data, handleChange }: AboutSectionProps) {
     return (
         <Box>
-            <Grid container spacing={3} mb={4}>
-                <Grid item xs={12}>
+            <Box mb={4} sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 3 }}>
+                <Box>
                     <TextField
                         fullWidth
                         label="Section Heading"
@@ -19,8 +19,8 @@ export default function AboutSection({ data, handleChange }: AboutSectionProps) 
                         onChange={(e) => handleChange('heading', e.target.value)}
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                     />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box>
                     <TextField
                         fullWidth
                         label="Sub Heading"
@@ -28,8 +28,8 @@ export default function AboutSection({ data, handleChange }: AboutSectionProps) 
                         onChange={(e) => handleChange('subHeading', e.target.value)}
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
             <Divider sx={{ mb: 3 }} textAlign="left">Paragraphs</Divider>
 

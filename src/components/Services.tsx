@@ -25,8 +25,39 @@ const services = [
     },
 ];
 
-export default function Services() {
+const iconMap: { [key: string]: any } = {
+    Edit,
+    Monitor,
+    TrendingUp
+};
+
+interface ServicesProps {
+    servicesData?: {
+        heading: string;
+        subHeading: string;
+        items: Array<{
+            icon: string;
+            title: string;
+            description: string;
+        }>;
+    };
+}
+
+export default function Services({ servicesData }: ServicesProps) {
     const sectionRef = useRef<HTMLElement>(null);
+
+    const heading = servicesData?.heading || 'Tailored Solutions';
+    const subHeading = servicesData?.subHeading || 'What We Do';
+    // Use dynamic items or fallback (though fallback logic for icons might need care if structure changes)
+    // For simplicity, if servicesData is present, we use it. If not, we could default to empty or keep hardcoded as default.
+    // Let's use the provided content or fallback to hardcoded list if "items" is missing.
+
+    // Transform items to include delay if not present in data (or just add it)
+    const items = servicesData ? servicesData.items.map((item, index) => ({
+        ...item,
+        iconComponent: iconMap[item.icon] || Edit, // Fallback icon
+        delay: index === 0 ? '' : `delay-${index}` // Add delay class based on index
+    })) : services.map(s => ({ ...s, iconComponent: s.icon }));
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -49,6 +80,16 @@ export default function Services() {
         return () => observer.disconnect();
     }, []);
 
+    // Helper to render heading title parts (assuming first word normal, rest colored, or just simple split?)
+    // The previous code had "Tailored <span ...>Solutions</span>"
+    // If we want to maintain that style with dynamic string, we might need a convention.
+    // For now, let's just render the string. Or split by space?
+    // The JSON says "Tailored Solutions". 
+    // Let's try to split: last word colored?
+    const titleParts = heading.split(' ');
+    const lastWord = titleParts.pop();
+    const firstPart = titleParts.join(' ');
+
     return (
         <section
             id="services"
@@ -62,16 +103,16 @@ export default function Services() {
             <Container maxWidth="xl">
                 <div className="reveal text-center md:text-left" style={{ marginBottom: '32px' }}>
                     <span className="block text-xs md:text-sm uppercase tracking-widest mb-2 font-semibold" style={{ color: 'var(--primary-color)' }}>
-                        What We Do
+                        {subHeading}
                     </span>
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight" style={{ marginBottom: '16px' }}>
-                        Tailored <span style={{ color: 'var(--primary-color)' }}>Solutions</span>
+                        {firstPart} <span style={{ color: 'var(--primary-color)' }}>{lastWord}</span>
                     </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: '24px' }}>
-                    {services.map((service, index) => {
-                        const IconComponent = service.icon;
+                    {items.map((service, index) => {
+                        const IconComponent = service.iconComponent;
                         return (
                             <Card
                                 key={index}

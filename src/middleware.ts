@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from './lib/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Get token from cookie
@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
 
     // If accessing login/register while authenticated, redirect to dashboard
     if ((pathname === '/login' || pathname === '/register') && token) {
-        const payload = verifyToken(token);
+        const payload = await verifyToken(token);
         if (payload) {
             const redirectUrl = payload.role === 'admin' ? '/admin' : '/dashboard';
             return NextResponse.redirect(new URL(redirectUrl, request.url));
@@ -27,7 +27,7 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
 
-        const payload = verifyToken(token);
+        const payload = await verifyToken(token);
         if (!payload) {
             // Invalid token, redirect to login
             const response = NextResponse.redirect(new URL('/login', request.url));
