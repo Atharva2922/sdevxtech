@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
+import connectDB from '@/lib/db';
 import Content from '@/models/Content';
 import fs from 'fs/promises';
 import path from 'path';
@@ -18,7 +18,7 @@ async function getInitialData() {
 }
 
 export async function GET() {
-    await dbConnect();
+    await connectDB();
 
     try {
         let content = await Content.findOne({});
@@ -40,7 +40,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    await dbConnect();
+    await connectDB();
 
     try {
         const body = await request.json();

@@ -7,7 +7,14 @@ import Footer from '@/components/Footer';
 import ColorPicker from '@/components/ColorPicker';
 
 async function getData() {
-  const res = await fetch('http://localhost:3000/api/content', { cache: 'no-store' });
+  // Use relative URL for API calls to work in both development and production
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/content`, {
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch data');
   }
