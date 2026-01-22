@@ -2,16 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import {
-    Typography, Box, Paper, TextField, Button,
-    Snackbar, Alert, IconButton, Divider, Grid,
-    List, ListItem, ListItemButton, ListItemIcon, ListItemText,
-    Avatar
+    Typography, Box, Snackbar, Alert, Paper, Fade, Card, CardContent, Divider, Tab, Tabs, Stack
 } from '@mui/material';
 import {
-    Save, Settings, Web, Image as ImageIcon,
-    BusinessCenter, Info, ContactMail, CallToAction,
-    ChevronRight
-} from '@mui/icons-material';
+    LayoutDashboard, Users, CreditCard, BarChart3,
+    Settings, Shield, Activity, FileText
+} from 'lucide-react';
+
+// Import New Components
+import AdminLayout from '@/components/admin/AdminLayout';
+import AdminSidebar, { SIDEBAR_ITEMS } from '@/components/admin/AdminSidebar';
+import AdminHeader from '@/components/admin/AdminHeader';
+
+// Import Sections
+import SettingsSection from '@/components/admin/sections/SettingsSection';
+import HeaderSection from '@/components/admin/sections/HeaderSection';
+import HeroSection from '@/components/admin/sections/HeroSection';
+import ServicesSection from '@/components/admin/sections/ServicesSection';
+import AboutSection from '@/components/admin/sections/AboutSection';
+import ContactSection from '@/components/admin/sections/ContactSection';
+import FooterSection from '@/components/admin/sections/FooterSection';
 
 interface ContentData {
     settings: any;
@@ -24,20 +34,24 @@ interface ContentData {
     [key: string]: any;
 }
 
-const MENU_ITEMS = [
-    { label: 'Settings', icon: Settings, id: 0 },
-    { label: 'Header', icon: Web, id: 1 },
-    { label: 'Hero Section', icon: ImageIcon, id: 2 },
-    { label: 'Services', icon: BusinessCenter, id: 3 },
-    { label: 'About', icon: Info, id: 4 },
-    { label: 'Contact', icon: ContactMail, id: 5 },
-    { label: 'Footer', icon: CallToAction, id: 6 },
+const CONTENT_TABS = [
+    { label: 'Header', id: 0 },
+    { label: 'Hero', id: 1 },
+    { label: 'Services', id: 2 },
+    { label: 'About', id: 3 },
+    { label: 'Contact', id: 4 },
+    { label: 'Footer', id: 5 },
 ];
 
 export default function AdminPage() {
     const [data, setData] = useState<ContentData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [currentTab, setCurrentTab] = useState(0);
+
+    // Navigation State
+    const [currentSection, setCurrentSection] = useState('dashboard');
+    const [currentContentTab, setCurrentContentTab] = useState(0);
+
+    const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
@@ -55,6 +69,7 @@ export default function AdminPage() {
 
     const handleSave = async () => {
         if (!data) return;
+        setSaving(true);
         try {
             const res = await fetch('/api/content', {
                 method: 'POST',
@@ -67,7 +82,9 @@ export default function AdminPage() {
                 throw new Error('Failed to save');
             }
         } catch (error) {
-            setToast({ open: true, message: 'Error saving changes', severity: 'error' });
+            setToast({ open: true, message: 'Error saving changes.', severity: 'error' });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -96,409 +113,149 @@ export default function AdminPage() {
     };
 
     if (loading || !data) return (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-            <Typography>Loading admin panel...</Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="#f8fafc">
+            <Typography variant="h6" color="text.secondary">Loading Dashboard...</Typography>
         </Box>
     );
 
-    return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f8fafc' }}>
+    // Helper to get Header Title
+    const getHeaderTitle = () => {
+        const item = SIDEBAR_ITEMS.find(i => i.id === currentSection);
+        return item ? item.label : 'Admin Panel';
+    };
 
-            {/* Sidebar */}
-            <Box sx={{
-                width: 280,
-                flexShrink: 0,
-                bgcolor: '#ffffff',
-                borderRight: '1px solid #e2e8f0',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'sticky',
-                top: 0,
-                height: '100vh'
-            }}>
-                <Box p={3} display="flex" alignItems="center" gap={2}>
-                    <Avatar sx={{ bgcolor: 'var(--primary-color)', width: 32, height: 32 }}>S</Avatar>
-                    <Typography variant="h6" fontWeight="bold" color="text.primary">
-                        SDEVX Admin
-                    </Typography>
-                </Box>
+    const getHeaderDescription = () => {
+        switch (currentSection) {
+            case 'dashboard': return 'Overview of your platform performance';
+            case 'content': return 'Manage website content and sections';
+            case 'settings': return 'System configuration and preferences';
+            default: return `Manage ${currentSection} settings`;
+        }
+    };
 
-                <Divider sx={{ mb: 2 }} />
-
-                <List component="nav" sx={{ px: 2 }}>
-                    {MENU_ITEMS.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = currentTab === item.id;
-                        return (
-                            <ListItemButton
-                                key={item.id}
-                                selected={isActive}
-                                onClick={() => setCurrentTab(item.id)}
-                                sx={{
-                                    borderRadius: '12px',
-                                    mb: 1,
-                                    bgcolor: isActive ? 'rgba(99, 102, 241, 0.08) !important' : 'transparent',
-                                    color: isActive ? 'var(--primary-color)' : 'text.secondary',
-                                    '&:hover': {
-                                        bgcolor: 'rgba(99, 102, 241, 0.04)',
-                                        color: 'var(--primary-color)',
-                                        '& .MuiListItemIcon-root': { color: 'var(--primary-color)' }
-                                    },
-                                }}
-                            >
-                                <ListItemIcon sx={{
-                                    minWidth: 40,
-                                    color: isActive ? 'var(--primary-color)' : 'text.secondary',
-                                }}>
-                                    <Icon fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={item.label}
-                                    primaryTypographyProps={{
-                                        fontWeight: isActive ? 600 : 500,
-                                        fontSize: '0.95rem'
-                                    }}
-                                />
-                                {isActive && <ChevronRight fontSize="small" />}
-                            </ListItemButton>
-                        );
-                    })}
-                </List>
-
-                <Box mt="auto" p={3}>
-                    <Box p={2} borderRadius={3} bgcolor="rgba(99, 102, 241, 0.05)" border="1px solid rgba(99, 102, 241, 0.1)">
-                        <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                            Logged in as Admin
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            v1.0.0
-                        </Typography>
+    // Render Dashboard View
+    const renderDashboard = () => (
+        <Stack spacing={3}>
+            <Box display="flex" gap={3} flexWrap="wrap">
+                {[
+                    { label: 'Total Users', value: '1,234', icon: Users, color: '#6366f1' },
+                    { label: 'Total Transactions', value: '$45,230', icon: CreditCard, color: '#10b981' },
+                    { label: 'Page Views', value: '89.4k', icon: Activity, color: '#f59e0b' },
+                    { label: 'Content Blocks', value: '42', icon: FileText, color: '#ec4899' }
+                ].map((stat, i) => (
+                    <Box key={i} flexGrow={1} minWidth={240}>
+                        <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
+                            <CardContent>
+                                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                                    <Box p={1} borderRadius="12px" bgcolor={`${stat.color}15`} color={stat.color}>
+                                        <stat.icon size={24} />
+                                    </Box>
+                                    <Typography variant="caption" color="success.main" fontWeight="bold">+12%</Typography>
+                                </Box>
+                                <Typography variant="h4" fontWeight="bold" color="text.primary">{stat.value}</Typography>
+                                <Typography variant="body2" color="text.secondary">{stat.label}</Typography>
+                            </CardContent>
+                        </Card>
                     </Box>
-                </Box>
+                ))}
             </Box>
 
-            {/* Main Content */}
-            <Box component="main" sx={{ flexGrow: 1, p: 4, overflowY: 'auto', height: '100vh' }}>
-
-                {/* Header */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                    <Box>
-                        <Typography variant="h5" fontWeight="bold" color="text.primary" gutterBottom>
-                            {MENU_ITEMS[currentTab].label}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Manage your {MENU_ITEMS[currentTab].label.toLowerCase().replace(' section', '')} settings and content
-                        </Typography>
-                    </Box>
-                    <Button
-                        variant="contained"
-                        startIcon={<Save />}
-                        onClick={handleSave}
-                        sx={{
-                            background: 'var(--primary-color)',
-                            px: 3, py: 1,
-                            borderRadius: '50px',
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
-                            '&:hover': {
-                                background: 'var(--primary-color)',
-                                opacity: 0.9,
-                                boxShadow: '0 6px 16px rgba(99, 102, 241, 0.3)',
-                            }
-                        }}
-                    >
-                        Save Changes
-                    </Button>
-                </Box>
-
-                <Paper elevation={0} sx={{
-                    p: 4,
-                    borderRadius: '24px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)'
-                }}>
-
-                    {/* Settings Tab */}
-                    {currentTab === 0 && (
-                        <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth label="Site Title" variant="outlined"
-                                    value={data.settings.title}
-                                    onChange={(e) => handleChange('settings', 'title', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth label="Site Description" variant="outlined"
-                                    value={data.settings.description}
-                                    onChange={(e) => handleChange('settings', 'description', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Box display="flex" gap={2} alignItems="center">
-                                    <TextField
-                                        fullWidth label="Theme Color" variant="outlined"
-                                        value={data.settings.themeColor}
-                                        onChange={(e) => handleChange('settings', 'themeColor', e.target.value)}
-                                    />
-                                    <Box
-                                        sx={{
-                                            width: 56, height: 56,
-                                            borderRadius: '12px',
-                                            bgcolor: data.settings.themeColor,
-                                            border: '1px solid #e2e8f0',
-                                            flexShrink: 0
-                                        }}
-                                    />
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    )}
-
-                    {/* Header Tab */}
-                    {currentTab === 1 && (
-                        <Box>
-                            {data.header.navItems.map((item: any, index: number) => (
-                                <Box key={index} display="flex" gap={2} mb={2}>
-                                    <TextField
-                                        fullWidth label="Label" size="small"
-                                        value={item.label}
-                                        onChange={(e) => handleArrayChange('header', 'navItems', index, 'label', e.target.value)}
-                                    />
-                                    <TextField
-                                        fullWidth label="Link hash (#id)" size="small"
-                                        value={item.href}
-                                        onChange={(e) => handleArrayChange('header', 'navItems', index, 'href', e.target.value)}
-                                    />
-                                </Box>
-                            ))}
-                        </Box>
-                    )}
-
-                    {/* Hero Tab */}
-                    {currentTab === 2 && (
-                        <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth label="Main Heading"
-                                    value={data.hero.heading}
-                                    onChange={(e) => handleChange('hero', 'heading', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth label="Highlight Text (Color Gradient)"
-                                    value={data.hero.highlightText}
-                                    onChange={(e) => handleChange('hero', 'highlightText', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth multiline rows={2} label="Subtext"
-                                    value={data.hero.subtext}
-                                    onChange={(e) => handleChange('hero', 'subtext', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Divider sx={{ my: 2 }}>Buttons</Divider>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth label="Primary Button Label" size="small"
-                                    value={data.hero.primaryButton.label}
-                                    onChange={(e) => handleChange('hero', 'primaryButton', e.target.value, 'label')}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth label="Primary Button Link" size="small"
-                                    value={data.hero.primaryButton.href}
-                                    onChange={(e) => handleChange('hero', 'primaryButton', e.target.value, 'href')}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth label="Secondary Button Label" size="small"
-                                    value={data.hero.secondaryButton?.label || ''}
-                                    onChange={(e) => handleChange('hero', 'secondaryButton', e.target.value, 'label')}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth label="Secondary Button Link" size="small"
-                                    value={data.hero.secondaryButton?.href || ''}
-                                    onChange={(e) => handleChange('hero', 'secondaryButton', e.target.value, 'href')}
-                                />
-                            </Grid>
-                        </Grid>
-                    )}
-
-                    {/* Services Tab */}
-                    {currentTab === 3 && (
-                        <Box>
-                            <Grid container spacing={3} mb={4}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth label="Section Heading"
-                                        value={data.services.heading}
-                                        onChange={(e) => handleChange('services', 'heading', e.target.value)}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth label="Sub Heading"
-                                        value={data.services.subHeading}
-                                        onChange={(e) => handleChange('services', 'subHeading', e.target.value)}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            {data.services.items.map((item: any, index: number) => (
-                                <Paper variant="outlined" key={index} sx={{ mb: 3, p: 3, borderRadius: '16px' }}>
-                                    <Typography variant="subtitle2" mb={2} color="primary" fontWeight="bold">Service {index + 1}</Typography>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                fullWidth label="Title" size="small"
-                                                value={item.title}
-                                                onChange={(e) => handleArrayChange('services', 'items', index, 'title', e.target.value)}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                fullWidth label="Icon (Lucide Name)" size="small"
-                                                value={item.icon}
-                                                onChange={(e) => handleArrayChange('services', 'items', index, 'icon', e.target.value)}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                fullWidth multiline rows={2} label="Description" size="small"
-                                                value={item.description}
-                                                onChange={(e) => handleArrayChange('services', 'items', index, 'description', e.target.value)}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Paper>
-                            ))}
-                        </Box>
-                    )}
-
-                    {/* About Tab */}
-                    {currentTab === 4 && (
-                        <Box>
-                            <Grid container spacing={3} mb={4}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth label="Section Heading"
-                                        value={data.about.heading}
-                                        onChange={(e) => handleChange('about', 'heading', e.target.value)}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth label="Sub Heading"
-                                        value={data.about.subHeading}
-                                        onChange={(e) => handleChange('about', 'subHeading', e.target.value)}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Divider sx={{ mb: 3 }} textAlign="left">Paragraphs</Divider>
-
-                            {data.about.paragraphs.map((para: string, index: number) => (
-                                <TextField
-                                    key={index}
-                                    fullWidth multiline rows={3} label={`Paragraph ${index + 1}`} sx={{ mb: 3 }}
-                                    value={para}
-                                    onChange={(e) => {
-                                        const newParas = [...data.about.paragraphs];
-                                        newParas[index] = e.target.value;
-                                        handleChange('about', 'paragraphs', newParas);
-                                    }}
-                                />
-                            ))}
-                        </Box>
-                    )}
-
-                    {/* Contact Tab */}
-                    {currentTab === 5 && (
-                        <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth label="Heading"
-                                    value={data.contact.heading}
-                                    onChange={(e) => handleChange('contact', 'heading', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth multiline rows={2} label="Subtext"
-                                    value={data.contact.subtext}
-                                    onChange={(e) => handleChange('contact', 'subtext', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth label="Button Label"
-                                    value={data.contact.buttonLabel}
-                                    onChange={(e) => handleChange('contact', 'buttonLabel', e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth label="Email Address"
-                                    value={data.contact.email}
-                                    onChange={(e) => handleChange('contact', 'email', e.target.value)}
-                                />
-                            </Grid>
-                        </Grid>
-                    )}
-
-                    {/* Footer Tab */}
-                    {currentTab === 6 && (
-                        <Box>
-                            <Grid container spacing={3} mb={4}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth label="Copyright Text"
-                                        value={data.footer.copyright}
-                                        onChange={(e) => handleChange('footer', 'copyright', e.target.value)}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Divider sx={{ mb: 3 }} textAlign="left">Social Links</Divider>
-                            {data.footer.socialLinks.map((item: any, index: number) => (
-                                <Box key={index} display="flex" gap={2} mb={2}>
-                                    <TextField
-                                        label="Platform" size="small"
-                                        value={item.label}
-                                        onChange={(e) => handleArrayChange('footer', 'socialLinks', index, 'label', e.target.value)}
-                                    />
-                                    <TextField
-                                        fullWidth label="URL" size="small"
-                                        value={item.href}
-                                        onChange={(e) => handleArrayChange('footer', 'socialLinks', index, 'href', e.target.value)}
-                                    />
-                                </Box>
-                            ))}
-                        </Box>
-                    )}
+            <Box>
+                <Paper sx={{ p: 4, borderRadius: '16px', border: '1px solid #e2e8f0', textAlign: 'center', minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <BarChart3 size={48} color="#94a3b8" />
+                    <Typography variant="h6" color="text.secondary" mt={2}>Analytics Chart Placeholder</Typography>
+                    <Typography variant="body2" color="text.muted">Real-time data visualization coming soon</Typography>
                 </Paper>
-
-                <Snackbar
-                    open={toast.open}
-                    autoHideDuration={6000}
-                    onClose={() => setToast({ ...toast, open: false })}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert severity={toast.severity} sx={{ width: '100%' }}>
-                        {toast.message}
-                    </Alert>
-                </Snackbar>
             </Box>
+        </Stack>
+    );
+
+    // Render Content Management View
+    const renderContentManager = () => (
+        <Box>
+            <Paper elevation={0} sx={{ mb: 3, borderBottom: '1px solid #e2e8f0', borderRadius: '16px 16px 0 0', overflow: 'hidden' }}>
+                <Tabs
+                    value={currentContentTab}
+                    onChange={(_, v) => setCurrentContentTab(v)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{ px: 2, bgcolor: 'white' }}
+                >
+                    {CONTENT_TABS.map((tab) => (
+                        <Tab key={tab.id} label={tab.label} sx={{ textTransform: 'none', fontWeight: 600, minHeight: 64 }} />
+                    ))}
+                </Tabs>
+            </Paper>
+
+            <Fade in={true} key={currentContentTab}>
+                <Paper elevation={0} sx={{
+                    p: 4, borderRadius: '0 0 16px 16px', border: '1px solid #e2e8f0',
+                    bgcolor: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)'
+                }}>
+                    {currentContentTab === 0 && <HeaderSection data={data.header} handleArrayChange={(arr, i, f, v) => handleArrayChange('header', arr, i, f, v)} />}
+                    {currentContentTab === 1 && <HeroSection data={data.hero} handleChange={(f, v, nf) => handleChange('hero', f, v, nf)} />}
+                    {currentContentTab === 2 && <ServicesSection data={data.services} handleChange={(f, v) => handleChange('services', f, v)} handleArrayChange={(arr, i, f, v) => handleArrayChange('services', arr, i, f, v)} />}
+                    {currentContentTab === 3 && <AboutSection data={data.about} handleChange={(f, v) => handleChange('about', f, v)} />}
+                    {currentContentTab === 4 && <ContactSection data={data.contact} handleChange={(f, v) => handleChange('contact', f, v)} />}
+                    {currentContentTab === 5 && <FooterSection data={data.footer} handleChange={(f, v) => handleChange('footer', f, v)} handleArrayChange={(arr, i, f, v) => handleArrayChange('footer', arr, i, f, v)} />}
+                </Paper>
+            </Fade>
         </Box>
+    );
+
+    // Main Content Switcher
+    const renderMainContent = () => {
+        switch (currentSection) {
+            case 'dashboard': return renderDashboard();
+
+            case 'content': return renderContentManager();
+
+            case 'settings': return (
+                <Paper elevation={0} sx={{ p: 4, borderRadius: '16px', border: '1px solid #e2e8f0', bgcolor: 'white' }}>
+                    <SettingsSection data={data.settings} handleChange={(f, v) => handleChange('settings', f, v)} />
+                </Paper>
+            );
+
+            default: return (
+                <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="60vh" color="text.secondary">
+                    <Shield size={64} style={{ marginBottom: 16, opacity: 0.2 }} />
+                    <Typography variant="h5" fontWeight="bold">Coming Soon</Typography>
+                    <Typography>The {getHeaderTitle()} module is currently under development.</Typography>
+                </Box>
+            );
+        }
+    };
+
+    return (
+        <AdminLayout
+            sidebar={<AdminSidebar currentSection={currentSection} setCurrentSection={setCurrentSection} />}
+        >
+            <AdminHeader
+                title={getHeaderTitle()}
+                description={getHeaderDescription()}
+                onSave={handleSave}
+                isSaving={saving}
+                showSaveButton={['content', 'settings'].includes(currentSection)}
+            />
+
+            {renderMainContent()}
+
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={4000}
+                onClose={() => setToast({ ...toast, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                TransitionComponent={Fade}
+            >
+                <Alert
+                    severity={toast.severity}
+                    sx={{ width: '100%', borderRadius: '12px', fontWeight: 500 }}
+                    variant="filled"
+                    onClose={() => setToast({ ...toast, open: false })}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
+        </AdminLayout>
     );
 }
