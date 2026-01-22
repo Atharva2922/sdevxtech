@@ -51,9 +51,9 @@ export default function AnalyticsSection() {
             </Paper>
 
             {/* Growth & Revenue Components */}
-            <Grid container spacing={3}>
+            <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '2fr 1fr' }} gap={3}>
                 {/* User Growth (Line Chart Simulation) */}
-                <Grid item xs={12} md={8}>
+                <Box>
                     <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
                             <Box display="flex" alignItems="center" gap={1}>
@@ -94,10 +94,10 @@ export default function AnalyticsSection() {
                             ))}
                         </Box>
                     </Paper>
-                </Grid>
+                </Box>
 
                 {/* Feature Usage (Stats Simulation) */}
-                <Grid item xs={12} md={4}>
+                <Box>
                     <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                         <Box display="flex" alignItems="center" gap={1} mb={4}>
                             <Box p={1} bgcolor="#ecfdf5" borderRadius="8px">
@@ -132,10 +132,10 @@ export default function AnalyticsSection() {
                             ))}
                         </Stack>
                     </Paper>
-                </Grid>
+                </Box>
 
                 {/* Top Active Users */}
-                <Grid item xs={12}>
+                <Box sx={{ gridColumn: '1 / -1' }}>
                     <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                             <Box display="flex" alignItems="center" gap={1}>
@@ -149,40 +149,38 @@ export default function AnalyticsSection() {
                             </Button>
                         </Box>
 
-                        <Grid container spacing={2}>
+                        <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }} gap={2}>
                             {[
                                 { name: 'John Doe', role: 'Premium', visits: '1.2k', p: 95 },
                                 { name: 'Sarah Wilson', role: 'Business', visits: '940', p: 82 },
                                 { name: 'Mike Ross', role: 'Basic', visits: '850', p: 70 },
                                 { name: 'Rachel Z', role: 'Premium', visits: '720', p: 55 },
                             ].map((user, i) => (
-                                <Grid item key={i} xs={12} sm={6} md={3}>
-                                    <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-                                        <CardContent sx={{ p: '16px !important' }}>
-                                            <Box display="flex" alignItems="center" gap={2}>
-                                                <Box
-                                                    width={40} height={40}
-                                                    borderRadius="50%"
-                                                    bgcolor={`hsl(${i * 50}, 70%, 50%)`}
-                                                    color="white"
-                                                    display="flex" alignItems="center" justifyContent="center"
-                                                    fontWeight="bold"
-                                                >
-                                                    {user.name.charAt(0)}
-                                                </Box>
-                                                <Box>
-                                                    <Typography variant="body2" fontWeight={600}>{user.name}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">{user.role} • {user.visits} visits</Typography>
-                                                </Box>
+                                <Card key={i} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                                    <CardContent sx={{ p: '16px !important' }}>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                            <Box
+                                                width={40} height={40}
+                                                borderRadius="50%"
+                                                bgcolor={`hsl(${i * 50}, 70%, 50%)`}
+                                                color="white"
+                                                display="flex" alignItems="center" justifyContent="center"
+                                                fontWeight="bold"
+                                            >
+                                                {user.name.charAt(0)}
                                             </Box>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
+                                            <Box>
+                                                <Typography variant="body2" fontWeight={600}>{user.name}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{user.role} • {user.visits} visits</Typography>
+                                            </Box>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
                             ))}
-                        </Grid>
+                        </Box>
                     </Paper>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Stack>
     );
 }

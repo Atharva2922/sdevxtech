@@ -26,6 +26,8 @@ import UsersSection from '@/components/admin/sections/UsersSection';
 import DataManagementSection from '@/components/admin/sections/DataManagementSection';
 import TransactionsSection from '@/components/admin/sections/TransactionsSection';
 import AnalyticsSection from '@/components/admin/sections/AnalyticsSection';
+import RolesSection from '@/components/admin/sections/RolesSection';
+import LogsSection from '@/components/admin/sections/LogsSection';
 
 interface ContentData {
     settings: any;
@@ -221,6 +223,10 @@ export default function AdminPage() {
             case 'transactions': return <TransactionsSection />;
 
             case 'analytics': return <AnalyticsSection />;
+
+            case 'roles': return <RolesSection />;
+
+            case 'logs': return <LogsSection />;
 
             case 'content': return renderContentManager();
 
