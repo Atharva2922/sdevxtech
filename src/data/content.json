@@ -1,0 +1,93 @@
+{
+  "settings": {
+    "title": "SDEVX Technology",
+    "description": "sanket",
+    "themeColor": "#ff0000"
+  },
+  "header": {
+    "navItems": [
+      {
+        "label": "Home",
+        "href": "#hero"
+      },
+      {
+        "label": "Mission",
+        "href": "#about"
+      },
+      {
+        "label": "Services",
+        "href": "#services"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ]
+  },
+  "hero": {
+    "heading": "Crafting Digital",
+    "highlightText": "Atharva",
+    "subtext": "Beautiful, functional, and responsive websites tailored to your unique needs.",
+    "primaryButton": {
+      "label": "Start Your Project",
+      "href": "#contact"
+    },
+    "secondaryButton": {
+      "label": "Explore Services",
+      "href": "#services"
+    }
+  },
+  "about": {
+    "heading": "Empowering Your Digital Presence",
+    "subHeading": "Our Mission",
+    "paragraphs": [
+      "At SDEVX Technology, we believe your website is more than just a URL—it's the heart of your digital identity. Our mission is to help businesses of all sizes build a strong online presence that drives growth and connects with their audience deeply and authentically.",
+      "This is just the beginning. We don't just build websites; we craft digital experiences that leave a lasting footprint."
+    ]
+  },
+  "services": {
+    "heading": "Tailored Solutions",
+    "subHeading": "What We Do",
+    "items": [
+      {
+        "title": "Web Design",
+        "description": "Visually stunning designs that capture your brand's essence and engage your visitors from the first click.",
+        "icon": "Edit"
+      },
+      {
+        "title": "Responsive Development",
+        "description": "Seamless experiences across all devices, ensuring your site looks perfect on mobile, tablet, and desktop.",
+        "icon": "Monitor"
+      },
+      {
+        "title": "Growth Strategy",
+        "description": "SEO-optimized structures and user-centric features designed to drive traffic and convert visitors.",
+        "icon": "TrendingUp"
+      }
+    ]
+  },
+  "contact": {
+    "heading": "Ready to transform your digital footprint?",
+    "subtext": "Let's build something amazing together.",
+    "buttonLabel": "Get in Touch",
+    "email": "hello@sdevx.com"
+  },
+  "footer": {
+    "logoAlt": "SDEVX Technology",
+    "copyright": "© 2024 SDEVX Technology. All rights reserved.",
+    "socialLinks": [
+      {
+        "label": "Twitter",
+        "href": "#"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "#"
+      },
+      {
+        "label": "Instagram",
+        "href": "#www.instagram.com"
+      }
+    ]
+  }
+}

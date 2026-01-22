@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --text-muted: #64748b;
+  --primary-color: #6366f1;
+  --secondary-color: #d946ef;
+  --accent-glow: rgba(99, 102, 241, 0.1);
+  --card-bg: #f8fafc;
+  --card-border: #e2e8f0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-color);
+  --color-foreground: var(--text-color);
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s forwards ease-out;
+}
+
+.delay-1 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.delay-2 {
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
 }
