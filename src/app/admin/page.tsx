@@ -22,6 +22,10 @@ import ServicesSection from '@/components/admin/sections/ServicesSection';
 import AboutSection from '@/components/admin/sections/AboutSection';
 import ContactSection from '@/components/admin/sections/ContactSection';
 import FooterSection from '@/components/admin/sections/FooterSection';
+import UsersSection from '@/components/admin/sections/UsersSection';
+import DataManagementSection from '@/components/admin/sections/DataManagementSection';
+import TransactionsSection from '@/components/admin/sections/TransactionsSection';
+import AnalyticsSection from '@/components/admin/sections/AnalyticsSection';
 
 interface ContentData {
     settings: any;
@@ -41,6 +45,7 @@ const CONTENT_TABS = [
     { label: 'About', id: 3 },
     { label: 'Contact', id: 4 },
     { label: 'Footer', id: 5 },
+    { label: 'Records', id: 6 }, // New Tab for Data Management
 ];
 
 export default function AdminPage() {
@@ -198,6 +203,7 @@ export default function AdminPage() {
                     {currentContentTab === 3 && <AboutSection data={data.about} handleChange={(f, v) => handleChange('about', f, v)} />}
                     {currentContentTab === 4 && <ContactSection data={data.contact} handleChange={(f, v) => handleChange('contact', f, v)} />}
                     {currentContentTab === 5 && <FooterSection data={data.footer} handleChange={(f, v) => handleChange('footer', f, v)} handleArrayChange={(arr, i, f, v) => handleArrayChange('footer', arr, i, f, v)} />}
+                    {currentContentTab === 6 && <DataManagementSection />}
                 </Paper>
             </Fade>
         </Box>
@@ -207,6 +213,14 @@ export default function AdminPage() {
     const renderMainContent = () => {
         switch (currentSection) {
             case 'dashboard': return renderDashboard();
+
+            case 'users': return <UsersSection />;
+
+            case 'records': return <DataManagementSection />; // Fallback if accessing directly
+
+            case 'transactions': return <TransactionsSection />;
+
+            case 'analytics': return <AnalyticsSection />;
 
             case 'content': return renderContentManager();
 
