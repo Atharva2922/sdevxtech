@@ -28,6 +28,8 @@ import TransactionsSection from '@/components/admin/sections/TransactionsSection
 import AnalyticsSection from '@/components/admin/sections/AnalyticsSection';
 import RolesSection from '@/components/admin/sections/RolesSection';
 import LogsSection from '@/components/admin/sections/LogsSection';
+import ProjectsManagementSection from '@/components/admin/sections/ProjectsManagementSection';
+import ProfileSection from '@/components/admin/sections/ProfileSection';
 
 interface ContentData {
     settings: any;
@@ -72,6 +74,17 @@ export default function AdminPage() {
                 console.error('Failed to load content', err);
                 setLoading(false);
             });
+
+        // Check for query parameters on initial load
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const section = params.get('section');
+            if (section) {
+                setCurrentSection(section);
+                // Remove query parameter from URL
+                window.history.replaceState({}, '', '/admin');
+            }
+        }
     }, []);
 
     const handleSave = async () => {
@@ -227,6 +240,10 @@ export default function AdminPage() {
             case 'roles': return <RolesSection />;
 
             case 'logs': return <LogsSection />;
+
+            case 'user-panel': return <ProjectsManagementSection />;
+
+            case 'profile': return <ProfileSection />;
 
             case 'content': return renderContentManager();
 

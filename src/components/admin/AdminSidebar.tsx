@@ -3,13 +3,15 @@
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, Divider } from '@mui/material';
 import {
     LayoutDashboard, Users, FileText, CreditCard,
-    BarChart3, Settings, Shield, Activity, ChevronRight
+    BarChart3, Settings, Shield, Activity, ChevronRight, FolderKanban, User
 } from 'lucide-react';
 
 export const SIDEBAR_ITEMS = [
     { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
+    { label: 'Profile', icon: User, id: 'profile' },
     { label: 'Users', icon: Users, id: 'users' },
     { label: 'Content / Data', icon: FileText, id: 'content' },
+    { label: 'User Panel Controls', icon: FolderKanban, id: 'user-panel' },
     { label: 'Transactions', icon: CreditCard, id: 'transactions' },
     { label: 'Analytics / Reports', icon: BarChart3, id: 'analytics' },
     { label: 'System / Settings', icon: Settings, id: 'settings' },

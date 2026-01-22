@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('auth-token')?.value;
 
     // Public routes that don't require authentication
-    const publicRoutes = ['/login', '/register', '/'];
+    const publicRoutes = ['/login', '/register', '/', '/landing'];
     const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
     // If accessing login/register while authenticated, redirect to dashboard
