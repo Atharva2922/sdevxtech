@@ -43,6 +43,9 @@ export async function POST(req: NextRequest) {
             role: user.role
         });
 
+        // Check if profile is completed (has at least phone or company filled)
+        const isProfileComplete = !!(user.phone || user.company || user.address || user.department);
+
         // Create response with token in httpOnly cookie
         const response = NextResponse.json(
             {
@@ -53,6 +56,7 @@ export async function POST(req: NextRequest) {
                     email: user.email,
                     role: user.role
                 },
+                isProfileComplete, // Add profile completion status
                 token // Also send in response body for localStorage option
             },
             { status: 200 }

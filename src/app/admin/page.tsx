@@ -8,6 +8,7 @@ import {
     LayoutDashboard, Users, CreditCard, BarChart3,
     Settings, Shield, Activity, FileText
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Import New Components
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -53,6 +54,7 @@ const CONTENT_TABS = [
 ];
 
 export default function AdminPage() {
+    const router = useRouter();
     const [data, setData] = useState<ContentData | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -224,6 +226,22 @@ export default function AdminPage() {
         </Box>
     );
 
+    // Logout Handler
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            localStorage.removeItem('auth-token');
+            localStorage.removeItem('user');
+            router.push('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Fallback logout even if API fails
+            localStorage.removeItem('auth-token');
+            localStorage.removeItem('user');
+            router.push('/login');
+        }
+    };
+
     // Main Content Switcher
     const renderMainContent = () => {
         switch (currentSection) {
@@ -273,6 +291,7 @@ export default function AdminPage() {
                 onSave={handleSave}
                 isSaving={saving}
                 showSaveButton={['content', 'settings'].includes(currentSection)}
+                onLogout={handleLogout}
             />
 
             {renderMainContent()}

@@ -9,9 +9,10 @@ interface AdminHeaderProps {
     onSave?: () => void;
     showSaveButton?: boolean;
     isSaving?: boolean;
+    onLogout?: () => void;
 }
 
-export default function AdminHeader({ title, description, onSave, showSaveButton = false, isSaving = false }: AdminHeaderProps) {
+export default function AdminHeader({ title, description, onSave, showSaveButton = false, isSaving = false, onLogout }: AdminHeaderProps) {
     return (
         <Box
             component="header"
@@ -93,7 +94,7 @@ export default function AdminHeader({ title, description, onSave, showSaveButton
                 )}
 
                 <Tooltip title="Logout">
-                    <IconButton size="small" sx={{ color: 'error.main', bgcolor: 'rgba(239, 68, 68, 0.1)' }}>
+                    <IconButton size="small" onClick={onLogout} sx={{ color: 'error.main', bgcolor: 'rgba(239, 68, 68, 0.1)' }}>
                         <LogOut size={20} />
                     </IconButton>
                 </Tooltip>

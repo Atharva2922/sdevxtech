@@ -13,6 +13,7 @@ interface UserSidebarProps {
     setCurrentSection: (section: string) => void;
     userName?: string;
     userEmail?: string;
+    userImage?: string;
 }
 
 const SIDEBAR_ITEMS = [
@@ -25,7 +26,7 @@ const SIDEBAR_ITEMS = [
     { label: 'Settings', icon: Settings, id: 'settings' },
 ];
 
-export default function UserSidebar({ currentSection, setCurrentSection, userName, userEmail }: UserSidebarProps) {
+export default function UserSidebar({ currentSection, setCurrentSection, userName, userEmail, userImage }: UserSidebarProps) {
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -66,8 +67,8 @@ export default function UserSidebar({ currentSection, setCurrentSection, userNam
             {/* User Info */}
             <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0' }}>
                 <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
-                        {userName?.charAt(0) || 'U'}
+                    <Avatar src={userImage} sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+                        {!userImage && (userName?.charAt(0) || 'U')}
                     </Avatar>
                     <Box>
                         <Typography variant="subtitle2" fontWeight={600}>

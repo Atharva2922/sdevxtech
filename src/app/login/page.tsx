@@ -38,11 +38,21 @@ export default function LoginPage() {
             localStorage.setItem('auth-token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
 
-            // Redirect based on role
+            // Redirect based on role and profile completion
             if (data.user.role === 'admin') {
-                router.push('/admin?section=profile');
+                // Admin users: check if profile is complete
+                if (data.isProfileComplete) {
+                    router.push('/admin'); // Go to dashboard if profile is complete
+                } else {
+                    router.push('/admin?section=profile'); // Go to profile if incomplete
+                }
             } else {
-                router.push('/user?section=profile');
+                // Regular users: check if profile is complete
+                if (data.isProfileComplete) {
+                    router.push('/user'); // Go to dashboard if profile is complete
+                } else {
+                    router.push('/user?section=profile'); // Go to profile if incomplete
+                }
             }
         } catch (err: any) {
             setError(err.message);

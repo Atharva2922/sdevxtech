@@ -5,6 +5,7 @@ import {
     LayoutDashboard, Users, FileText, CreditCard,
     BarChart3, Settings, Shield, Activity, ChevronRight, FolderKanban, User
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export const SIDEBAR_ITEMS = [
     { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
@@ -25,6 +26,33 @@ interface AdminSidebarProps {
 }
 
 export default function AdminSidebar({ currentSection, setCurrentSection }: AdminSidebarProps) {
+    const [userName, setUserName] = useState('Admin User');
+    const [userEmail, setUserEmail] = useState('admin@sdevx.com');
+    const [userInitials, setUserInitials] = useState('AD');
+    const [userImage, setUserImage] = useState('');
+
+    useEffect(() => {
+        // Get user data from localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            try {
+                const user = JSON.parse(userData);
+                setUserName(user.name || 'Admin User');
+                setUserEmail(user.email || 'admin@sdevx.com');
+                setUserImage(user.image || '');
+
+                // Generate initials from name
+                const nameParts = (user.name || 'Admin User').split(' ');
+                const initials = nameParts.length > 1
+                    ? nameParts[0].charAt(0) + nameParts[1].charAt(0)
+                    : nameParts[0].charAt(0) + (nameParts[0].charAt(1) || '');
+                setUserInitials(initials.toUpperCase());
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    }, []);
+
     return (
         <Box sx={{
             width: 280,
@@ -108,16 +136,28 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
                     background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(217, 70, 239, 0.1) 100%)',
                     border: '1px solid rgba(99, 102, 241, 0.1)'
                 }}>
-                    <Box display="flex" alignItems="center" gap={1.5} mb={1}>
-                        <Avatar sx={{ width: 32, height: 32, fontSize: '0.8rem', bgcolor: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)' }}>
-                            AD
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                        <Avatar
+                            src={userImage}
+                            sx={{ width: 32, height: 32, fontSize: '0.8rem', bgcolor: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', flexShrink: 0 }}
+                        >
+                            {!userImage && userInitials}
                         </Avatar>
-                        <Box>
-                            <Typography variant="body2" fontWeight="600" color="text.primary">
-                                Admin User
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography variant="body2" fontWeight="600" color="text.primary" sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {userName}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary" display="block">
-                                admin@sdevx.com
+                            <Typography variant="caption" color="text.secondary" sx={{
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {userEmail}
                             </Typography>
                         </Box>
                     </Box>

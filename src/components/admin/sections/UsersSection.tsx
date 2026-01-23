@@ -30,12 +30,14 @@ export default function UsersSection() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('/api/users');
+                const response = await fetch('/api/users', {
+                    credentials: 'include'
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setUsers(data.users || []);
                 } else {
-                    console.error('Failed to fetch users');
+                    console.error('Failed to fetch users', await response.text());
                 }
             } catch (error) {
                 console.error('Error loading users:', error);

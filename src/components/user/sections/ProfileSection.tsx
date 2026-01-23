@@ -1,9 +1,207 @@
-import { Box, Paper, Typography, Stack, TextField, Button, Avatar, Grid } from '@mui/material';
-import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
-import { useState } from 'react';
+'use client';
+
+import { Box, Paper, Typography, Stack, TextField, Button, Avatar, Grid, Alert, Snackbar } from '@mui/material';
+import { User, Mail, Phone, MapPin, Save, Building2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface ProfileData {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    address: string;
+    image: string;
+}
 
 export default function ProfileSection() {
     const [editing, setEditing] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [profileData, setProfileData] = useState<ProfileData>({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        address: '',
+        image: ''
+    });
+
+    // Password change state
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [changingPassword, setChangingPassword] = useState(false);
+
+    // Toast notifications
+    const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+    // Fetch profile data on mount
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const res = await fetch('/api/profile', {
+                credentials: 'include'
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to fetch profile');
+            }
+
+            const data = await res.json();
+            setProfileData({
+                name: data.user.name || '',
+                email: data.user.email || '',
+                phone: data.user.phone || '',
+                company: data.user.company || '',
+                address: data.user.address || '',
+                image: data.user.image || ''
+            });
+        } catch (error: any) {
+            console.error('Profile fetch error:', error);
+            setToast({ open: true, message: 'Failed to load profile', severity: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        if (!profileData.name.trim()) {
+            setToast({ open: true, message: 'Name is required', severity: 'error' });
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const res = await fetch('/api/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    name: profileData.name,
+                    phone: profileData.phone,
+                    company: profileData.company,
+                    address: profileData.address,
+                    image: profileData.image
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to update profile');
+            }
+
+            setToast({ open: true, message: 'Profile updated successfully!', severity: 'success' });
+            setEditing(false);
+
+            // Update localStorage user data
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                user.name = data.user.name;
+                user.image = data.user.image;
+                localStorage.setItem('user', JSON.stringify(user));
+                // Dispatch event to update sidebar
+                window.dispatchEvent(new Event('user-updated'));
+            }
+        } catch (error: any) {
+            console.error('Profile update error:', error);
+            setToast({ open: true, message: error.message || 'Failed to update profile', severity: 'error' });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        // Validation
+        if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+            setToast({ open: true, message: 'All password fields are required', severity: 'error' });
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            setToast({ open: true, message: 'New password must be at least 6 characters', severity: 'error' });
+            return;
+        }
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setToast({ open: true, message: 'New passwords do not match', severity: 'error' });
+            return;
+        }
+
+        setChangingPassword(true);
+        try {
+            const res = await fetch('/api/profile/password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to change password');
+            }
+
+            setToast({ open: true, message: 'Password changed successfully!', severity: 'success' });
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (error: any) {
+            console.error('Password change error:', error);
+            setToast({ open: true, message: error.message || 'Failed to change password', severity: 'error' });
+        } finally {
+            setChangingPassword(false);
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            setToast({ open: true, message: 'Uploading photo...', severity: 'success' });
+
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Upload failed');
+            }
+
+            // Update profile data with new image URL
+            setProfileData(prev => ({ ...prev, image: data.imageUrl }));
+
+            setToast({ open: true, message: 'Photo uploaded! Click Save to apply.', severity: 'success' });
+        } catch (error: any) {
+            console.error('Upload error:', error);
+            setToast({ open: true, message: error.message || 'Failed to upload photo', severity: 'error' });
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box display="flex" alignItems="center" justifyContent="center" minHeight="400px">
+                <Typography>Loading profile...</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Stack spacing={3}>
@@ -19,7 +217,8 @@ export default function ProfileSection() {
                 <Button
                     variant={editing ? 'contained' : 'outlined'}
                     startIcon={editing ? <Save size={18} /> : <User size={18} />}
-                    onClick={() => setEditing(!editing)}
+                    onClick={editing ? handleSaveProfile : () => setEditing(true)}
+                    disabled={saving}
                     sx={{
                         textTransform: 'none',
                         borderRadius: '12px',
@@ -28,14 +227,22 @@ export default function ProfileSection() {
                         }),
                     }}
                 >
-                    {editing ? 'Save Changes' : 'Edit Profile'}
+                    {saving ? 'Saving...' : editing ? 'Save Changes' : 'Edit Profile'}
                 </Button>
             </Box>
 
             <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                 <Box display="flex" alignItems="center" gap={3} mb={4}>
-                    <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', fontSize: 32 }}>
-                        U
+                    <Avatar
+                        src={profileData.image}
+                        sx={{
+                            width: 80,
+                            height: 80,
+                            bgcolor: 'primary.main',
+                            fontSize: 32
+                        }}
+                    >
+                        {!profileData.image && profileData.name.charAt(0).toUpperCase()}
                     </Avatar>
                     <Box>
                         <Typography variant="h6" fontWeight="bold">
@@ -45,9 +252,20 @@ export default function ProfileSection() {
                             JPG, PNG or GIF. Max size 2MB
                         </Typography>
                         {editing && (
-                            <Button variant="outlined" size="small" sx={{ textTransform: 'none', borderRadius: '8px' }}>
-                                Upload Photo
-                            </Button>
+                            <>
+                                <input
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    id="user-profile-file-input"
+                                    type="file"
+                                    onChange={handleFileUpload}
+                                />
+                                <label htmlFor="user-profile-file-input">
+                                    <Button variant="outlined" component="span" size="small" sx={{ textTransform: 'none', borderRadius: '8px' }}>
+                                        Upload Photo
+                                    </Button>
+                                </label>
+                            </>
                         )}
                     </Box>
                 </Box>
@@ -55,11 +273,12 @@ export default function ProfileSection() {
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
-                            Full Name
+                            Full Name *
                         </Typography>
                         <TextField
                             fullWidth
-                            defaultValue="John Doe"
+                            value={profileData.name}
+                            onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                             disabled={!editing}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
@@ -71,8 +290,8 @@ export default function ProfileSection() {
                         </Typography>
                         <TextField
                             fullWidth
-                            defaultValue="john.doe@example.com"
-                            disabled={!editing}
+                            value={profileData.email}
+                            disabled
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -83,8 +302,10 @@ export default function ProfileSection() {
                         </Typography>
                         <TextField
                             fullWidth
-                            defaultValue="+1 (555) 123-4567"
+                            value={profileData.phone}
+                            onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                             disabled={!editing}
+                            placeholder="+1 (555) 123-4567"
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -95,8 +316,10 @@ export default function ProfileSection() {
                         </Typography>
                         <TextField
                             fullWidth
-                            defaultValue="Acme Corp"
+                            value={profileData.company}
+                            onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
                             disabled={!editing}
+                            placeholder="Your Company"
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -109,8 +332,10 @@ export default function ProfileSection() {
                             fullWidth
                             multiline
                             rows={2}
-                            defaultValue="123 Main St, Suite 100, San Francisco, CA 94105"
+                            value={profileData.address}
+                            onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
                             disabled={!editing}
+                            placeholder="Your address"
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -129,6 +354,8 @@ export default function ProfileSection() {
                         <TextField
                             fullWidth
                             type="password"
+                            value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -139,6 +366,8 @@ export default function ProfileSection() {
                         <TextField
                             fullWidth
                             type="password"
+                            value={passwordData.newPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
@@ -149,19 +378,39 @@ export default function ProfileSection() {
                         <TextField
                             fullWidth
                             type="password"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
                     <Grid item xs={12}>
                         <Button
                             variant="outlined"
+                            onClick={handleChangePassword}
+                            disabled={changingPassword}
                             sx={{ textTransform: 'none', borderRadius: '12px' }}
                         >
-                            Update Password
+                            {changingPassword ? 'Updating...' : 'Update Password'}
                         </Button>
                     </Grid>
                 </Grid>
             </Paper>
+
+            {/* Toast Notification */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={4000}
+                onClose={() => setToast({ ...toast, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setToast({ ...toast, open: false })}
+                    severity={toast.severity}
+                    sx={{ borderRadius: '12px' }}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Stack>
     );
 }

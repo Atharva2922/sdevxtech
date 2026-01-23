@@ -16,16 +16,28 @@ export default function UserDashboard() {
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
-        // Get user from localStorage
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            const parsedUser = JSON.parse(userData);
-            setUser(parsedUser);
-        } else {
-            router.push('/login');
-        }
+        const loadUser = () => {
+            // Get user from localStorage
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                const parsedUser = JSON.parse(userData);
+                setUser(parsedUser);
+            } else {
+                router.push('/login');
+            }
+        };
 
-        // Check for query parameters on initial load
+        loadUser();
+
+        // Listen for user updates
+        window.addEventListener('user-updated', loadUser);
+
+        return () => {
+            window.removeEventListener('user-updated', loadUser);
+        };
+    }, [router]);
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const section = params.get('section');
@@ -35,7 +47,7 @@ export default function UserDashboard() {
                 window.history.replaceState({}, '', '/user');
             }
         }
-    }, [router]);
+    }, []);
 
     if (!user) {
         return (
@@ -74,6 +86,7 @@ export default function UserDashboard() {
                 setCurrentSection={setCurrentSection}
                 userName={user.name}
                 userEmail={user.email}
+                userImage={user.image}
             />
 
             {/* Main Content */}
