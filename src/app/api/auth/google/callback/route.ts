@@ -23,11 +23,13 @@ export async function GET(req: NextRequest) {
         }
 
         // Get user info from Google
-        const googleUser = await getGoogleUserInfo(code);
+        const permissionOrigin = req.nextUrl.origin;
+        const redirectUri = `${permissionOrigin}/api/auth/google/callback`;
+        const googleUser = await getGoogleUserInfo(code, redirectUri);
 
         if (!googleUser.email) {
             return NextResponse.redirect(
-                new URL(`/login?error=no_email_from_google`, req.url)
+                `${req.nextUrl.origin}/login?error=no_email_from_google`
             );
         }
 
