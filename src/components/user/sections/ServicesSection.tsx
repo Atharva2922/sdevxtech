@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Stack, Grid, Card, CardContent, Button, Chip, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
 import { Code, Palette, Search, Smartphone, TrendingUp, Shield } from 'lucide-react';

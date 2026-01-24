@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Grid, Card, CardContent, LinearProgress, Chip, Stack, Button, CircularProgress } from '@mui/material';
 import { FolderKanban, Clock, CheckCircle, AlertCircle, TrendingUp, MessageSquare } from 'lucide-react';

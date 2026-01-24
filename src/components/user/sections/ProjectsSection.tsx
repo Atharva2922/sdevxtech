@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Stack, Chip, Button, LinearProgress, Grid, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { FolderKanban, Clock, Download, Eye, Plus } from 'lucide-react';
