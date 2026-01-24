@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Box, Paper, TextField, Button, Typography, Alert, Stack, InputAdornment,
-    IconButton, Divider
+    IconButton, Divider, Tabs, Tab
 } from '@mui/material';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+import OTPLogin from '@/components/auth/OTPLogin';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -15,6 +17,7 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,91 +118,115 @@ export default function LoginPage() {
                         </Alert>
                     )}
 
-                    {/* Login Form */}
-                    <form onSubmit={handleLogin}>
-                        <Stack spacing={2.5}>
-                            <TextField
-                                fullWidth
-                                label="Email Address"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Mail size={20} color="#94a3b8" />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                    }
-                                }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Password"
-                                type={showPassword ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Lock size={20} color="#94a3b8" />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                edge="end"
-                                                size="small"
-                                            >
-                                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                    }
-                                }}
-                            />
-
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                size="large"
-                                fullWidth
-                                disabled={loading}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 1.5,
-                                    textTransform: 'none',
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-                                    '&:hover': {
-                                        boxShadow: '0 6px 30px rgba(102, 126, 234, 0.6)',
-                                    }
-                                }}
-                            >
-                                {loading ? 'Signing in...' : 'Sign In'}
-                            </Button>
-                        </Stack>
-                    </form>
+                    {/* Google Sign-In */}
+                    <GoogleSignInButton />
 
                     <Divider sx={{ my: 1 }}>
                         <Typography variant="caption" color="text.secondary">
                             OR
                         </Typography>
                     </Divider>
+
+                    {/* Login Method Tabs */}
+                    <Tabs
+                        value={loginMethod}
+                        onChange={(_, newValue) => setLoginMethod(newValue)}
+                        centered
+                        sx={{
+                            '& .MuiTab-root': {
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }
+                        }}
+                    >
+                        <Tab label="Password" value="password" />
+                        <Tab label="OTP" value="otp" />
+                    </Tabs>
+
+                    {/* Password Login Form */}
+                    {loginMethod === 'password' && (
+                        <form onSubmit={handleLogin}>
+                            <Stack spacing={2.5}>
+                                <TextField
+                                    fullWidth
+                                    label="Email Address"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Mail size={20} color="#94a3b8" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '12px',
+                                        }
+                                    }}
+                                />
+
+                                <TextField
+                                    fullWidth
+                                    label="Password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock size={20} color="#94a3b8" />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    edge="end"
+                                                    size="small"
+                                                >
+                                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '12px',
+                                        }
+                                    }}
+                                />
+
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth
+                                    disabled={loading}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        py: 1.5,
+                                        textTransform: 'none',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
+                                        '&:hover': {
+                                            boxShadow: '0 6px 30px rgba(102, 126, 234, 0.6)',
+                                        }
+                                    }}
+                                >
+                                    {loading ? 'Signing in...' : 'Sign In'}
+                                </Button>
+                            </Stack>
+                        </form>
+                    )}
+
+                    {/* OTP Login */}
+                    {loginMethod === 'otp' && <OTPLogin initialEmail={email} />}
 
                     {/* Register Link */}
                     <Box textAlign="center">

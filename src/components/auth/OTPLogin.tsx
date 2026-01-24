@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     TextField,
@@ -11,13 +11,24 @@ import {
 } from '@mui/material';
 import { Email as EmailIcon } from '@mui/icons-material';
 
-export default function OTPLogin() {
-    const [email, setEmail] = useState('');
+interface OTPLoginProps {
+    initialEmail?: string;
+}
+
+export default function OTPLogin({ initialEmail = '' }: OTPLoginProps) {
+    const [email, setEmail] = useState(initialEmail);
     const [otp, setOtp] = useState('');
     const [step, setStep] = useState<'email' | 'otp'>('email');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    // Update email when initialEmail prop changes
+    useEffect(() => {
+        if (initialEmail) {
+            setEmail(initialEmail);
+        }
+    }, [initialEmail]);
 
     const handleRequestOTP = async (e: React.FormEvent) => {
         e.preventDefault();

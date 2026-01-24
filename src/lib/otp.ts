@@ -1,26 +1,33 @@
 import crypto from 'crypto';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // Generate 6-digit OTP
 export function generateOTP(): string {
-    return crypto.randomInt(100000, 999999).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 // Hash OTP for secure storage
 export function hashOTP(otp: string): string {
-    return crypto.createHash('sha256').update(otp).digest('hex');
+  return crypto.createHash('sha256').update(otp).digest('hex');
 }
 
 // Send OTP via email using Resend
 export async function sendOTP(email: string, otp: string, name?: string) {
-    try {
-        await resend.emails.send({
-            from: 'SDEVX Technology <onboarding@resend.dev>', // Change this to your verified domain
-            to: email,
-            subject: 'Your SDEVX Login OTP',
-            html: `
+  // Check if Resend is configured
+  if (!resend) {
+    throw new Error('Email service not configured. Please set RESEND_API_KEY environment variable.');
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'SDEVX Technology <onboarding@resend.dev>', // Change this to your verified domain
+      to: email,
+      subject: 'Your SDEVX Login OTP',
+      html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -64,22 +71,22 @@ export async function sendOTP(email: string, otp: string, name?: string) {
           </body>
         </html>
       `,
-        });
+    });
 
-        return true;
-    } catch (error) {
-        console.error('Failed to send OTP email:', error);
-        throw new Error('Failed to send OTP email');
-    }
+    return true;
+  } catch (error) {
+    console.error('Failed to send OTP email:', error);
+    throw new Error('Failed to send OTP email. Please try again later.');
+  }
 }
 
 // Verify OTP
 export function verifyOTP(inputOTP: string, storedHashedOTP: string): boolean {
-    const hashedInput = hashOTP(inputOTP);
-    return hashedInput === storedHashedOTP;
+  const hashedInput = hashOTP(inputOTP);
+  return hashedInput === storedHashedOTP;
 }
 
 // Check if OTP is expired
 export function isOTPExpired(expiryDate: Date): boolean {
-    return new Date() > expiryDate;
+  return new Date() > expiryDate;
 }
