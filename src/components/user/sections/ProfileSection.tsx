@@ -49,7 +49,8 @@ export default function ProfileSection() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to fetch profile');
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || `Failed to fetch profile (${res.status})`);
             }
 
             const data = await res.json();

@@ -74,9 +74,10 @@ export async function sendOTP(email: string, otp: string, name?: string) {
     });
 
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to send OTP email:', error);
-    throw new Error('Failed to send OTP email. Please try again later.');
+    const errorMessage = error?.message || error?.response?.message || 'Unknown error';
+    throw new Error(`Failed to send email: ${errorMessage}`);
   }
 }
 

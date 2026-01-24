@@ -67,13 +67,14 @@ export async function GET(req: NextRequest) {
             role: user.role,
         });
 
-        // Create response with redirect
+        // Create response with redirect based on role
+        const redirectPath = user.role === 'admin' ? '/admin' : '/user';
         const response = NextResponse.redirect(
-            new URL('/user', req.url)
+            new URL(redirectPath, req.url)
         );
 
         // Set token in cookie
-        response.cookies.set('token', token, {
+        response.cookies.set('auth-token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',

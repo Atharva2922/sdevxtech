@@ -64,10 +64,10 @@ export async function POST(req: NextRequest) {
         // Send OTP via email
         try {
             await sendOTP(email, otp, user.name);
-        } catch (emailError) {
+        } catch (emailError: any) {
             console.error('Failed to send OTP email:', emailError);
             return NextResponse.json(
-                { error: 'Failed to send OTP email. Please try again.' },
+                { error: emailError.message || 'Failed to send OTP email' },
                 { status: 500 }
             );
         }

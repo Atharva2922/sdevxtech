@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
         });
 
         // Return user data and token
-        return NextResponse.json({
+        // Create response
+        const response = NextResponse.json({
             success: true,
             message: 'Login successful',
             token,
@@ -93,6 +94,16 @@ export async function POST(req: NextRequest) {
                 image: user.image,
             },
         });
+
+        // Set token in cookie
+        response.cookies.set('auth-token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60, // 7 days
+        });
+
+        return response;
     } catch (error: unknown) {
         console.error('OTP verification error:', error);
         return NextResponse.json(
