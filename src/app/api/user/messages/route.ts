@@ -81,9 +81,9 @@ export async function POST(req: NextRequest) {
         // OR we just require it. Let's make toUserId optional and if missing, it's a "general" message.
 
         const newMessage = await Message.create({
-            from: 'user', // Enum in model
+            from: payload.role === 'admin' ? 'admin' : 'user',
             fromUserId: payload.userId,
-            toUserId: toUserId || null, // Null means general/admin
+            toUserId: toUserId || null,
             subject,
             message,
             isRead: false

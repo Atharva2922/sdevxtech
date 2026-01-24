@@ -3,7 +3,7 @@
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, Divider } from '@mui/material';
 import {
     LayoutDashboard, Users, FileText, CreditCard,
-    BarChart3, Settings, Shield, Activity, ChevronRight, FolderKanban, User
+    BarChart3, Settings, Shield, Activity, ChevronRight, FolderKanban, User, MessageSquare
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -12,6 +12,7 @@ export const SIDEBAR_ITEMS = [
     { label: 'Profile', icon: User, id: 'profile' },
     { label: 'Users', icon: Users, id: 'users' },
     { label: 'Content / Data', icon: FileText, id: 'content' },
+    { label: 'Client Msgs', icon: MessageSquare, id: 'messages' }, // Added Messages
     { label: 'User Panel Controls', icon: FolderKanban, id: 'user-panel' },
     { label: 'Transactions', icon: CreditCard, id: 'transactions' },
     { label: 'Analytics / Reports', icon: BarChart3, id: 'analytics' },

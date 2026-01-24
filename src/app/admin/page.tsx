@@ -31,6 +31,7 @@ import RolesSection from '@/components/admin/sections/RolesSection';
 import LogsSection from '@/components/admin/sections/LogsSection';
 import ProjectsManagementSection from '@/components/admin/sections/ProjectsManagementSection';
 import ProfileSection from '@/components/admin/sections/ProfileSection';
+import AdminMessagesSection from '@/components/admin/sections/MessagesSection';
 
 interface ContentData {
     settings: any;
@@ -261,6 +262,8 @@ export default function AdminPage() {
             case 'logs': return <LogsSection />;
 
             case 'user-panel': return <ProjectsManagementSection />;
+
+            case 'messages': return <AdminMessagesSection />;
 
             case 'profile': return <ProfileSection />;
 
