@@ -16,7 +16,10 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        required: function (this: any) {
+            // Password only required for local auth
+            return this.authProvider === 'local';
+        },
         minlength: [6, 'Password must be at least 6 characters']
     },
     role: {
@@ -47,6 +50,29 @@ const UserSchema = new mongoose.Schema({
     image: {
         type: String,
         default: ''
+    },
+    // OAuth and OTP fields
+    authProvider: {
+        type: String,
+        enum: ['local', 'google', 'otp'],
+        default: 'local'
+    },
+    googleId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    otp: {
+        type: String,
+        select: false // Don't return OTP in queries by default
+    },
+    otpExpires: {
+        type: Date,
+        select: false
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
     },
     createdAt: {
         type: Date,
