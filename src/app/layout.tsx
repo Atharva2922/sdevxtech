@@ -14,30 +14,16 @@ export const metadata: Metadata = {
   description: "SDEVX Technology: Crafting beautiful, functional, and responsive websites to transform your digital footprint.",
 };
 
-async function getSettings() {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-    const res = await fetch(`${baseUrl}/api/content`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      return data.settings;
-    }
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-  }
-  return null;
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSettings();
-  const themeColor = settings?.themeColor || '#6366f1';
-  const secondaryColor = settings?.secondaryColor || '#d946ef';
-  const backgroundColor = settings?.backgroundColor || '#ffffff';
-  const paperColor = settings?.paperColor || '#f8fafc';
+  // Use default theme values - settings can be fetched client-side if needed
+  const themeColor = '#6366f1';
+  const secondaryColor = '#d946ef';
+  const backgroundColor = '#ffffff';
+  const paperColor = '#f8fafc';
 
   return (
     <html lang="en" suppressHydrationWarning>
