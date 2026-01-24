@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
                 createdAt: u.createdAt
             }))
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Debug users error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch users', details: error.message },
+            { error: 'Failed to fetch users', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

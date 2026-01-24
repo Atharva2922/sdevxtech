@@ -1,0 +1,290 @@
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\admin\messages\route.ts[24m[0m
+[0m  [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\auth\logout\route.ts[24m[0m
+[0m  [2m3:28[22m  [33mwarning[39m  'req' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\debug-users\route.ts[24m[0m
+[0m  [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\seed-services\route.ts[24m[0m
+[0m  [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\seed-users\route.ts[24m[0m
+[0m   [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m28:15[22m  [33mwarning[39m  'adminUser' is assigned a value but never used    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m37:15[22m  [33mwarning[39m  'regularUser' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\user\projects\route.ts[24m[0m
+[0m  [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\api\user\stats\route.ts[24m[0m
+[0m  [2m1:10[22m  [33mwarning[39m  'NextRequest' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\dashboard\page.tsx[24m[0m
+[0m  [2m19:13[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mD:\sdevx\next\next\src\app\dashboard\page.tsx:19:13[0m
+[0m  17 |         const userData = localStorage.getItem('user');[0m
+[0m  18 |         if (userData) {[0m
+[0m> 19 |             setUser(JSON.parse(userData));[0m
+[0m     |             ^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  20 |         } else {[0m
+[0m  21 |             router.push('/login');[0m
+[0m  22 |         }  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\app\user\page.tsx[24m[0m
+[0m  [2m47:17[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mD:\sdevx\next\next\src\app\user\page.tsx:47:17[0m
+[0m  45 |             if (section) {[0m
+[0m  46 |                 // Defer state update to avoid sync warning or accept it as initial sync[0m
+[0m> 47 |                 setCurrentSection(section);[0m
+[0m     |                 ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  48 |                 // Remove query parameter from URL[0m
+[0m  49 |                 window.history.replaceState({}, '', '/user');[0m
+[0m  50 |             }  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\ColorPicker.tsx[24m[0m
+[0m  [2m17:13[22m  [31merror[39m  Error: Cannot access variable before it is declared[0m
+[0m[0m
+[0m`applyColor` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.[0m
+[0m[0m
+[0mD:\sdevx\next\next\src\components\ColorPicker.tsx:17:13[0m
+[0m  15 |         if (savedColor) {[0m
+[0m  16 |             setColor(savedColor);[0m
+[0m> 17 |             applyColor(savedColor);[0m
+[0m     |             ^^^^^^^^^^ `applyColor` accessed before it is declared[0m
+[0m  18 |         }[0m
+[0m  19 |     }, []);[0m
+[0m  20 |[0m
+[0m[0m
+[0mD:\sdevx\next\next\src\components\ColorPicker.tsx:21:5[0m
+[0m  19 |     }, []);[0m
+[0m  20 |[0m
+[0m> 21 |     const applyColor = (newColor: string) => {[0m
+[0m     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 22 |         document.documentElement.style.setProperty('--primary-color', newColor);[0m
+[0m     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 23 |         localStorage.setItem('themeColor', newColor);[0m
+[0m     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 24 |     };[0m
+[0m     | ^^^^^^^ `applyColor` is declared here[0m
+[0m  25 |[0m
+[0m  26 |     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {[0m
+[0m  27 |         setAnchorEl(event.currentTarget);  [2mreact-hooks/immutability[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\AdminSidebar.tsx[24m[0m
+[0m  [2m42:17[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mD:\sdevx\next\next\src\components\admin\AdminSidebar.tsx:42:17[0m
+[0m  40 |                 const user = JSON.parse(userData);[0m
+[0m  41 |                 // Avoid setState in effect warning by doing it conditionally or accepting it's on mount[0m
+[0m> 42 |                 setUserName(user.name || 'Admin User');[0m
+[0m     |                 ^^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  43 |                 setUserEmail(user.email || 'admin@sdevx.com');[0m
+[0m  44 |                 setUserImage(user.image || '');[0m
+[0m  45 |  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\AboutSection.tsx[24m[0m
+[0m  [2m3:15[22m  [33mwarning[39m  'Grid' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m6:11[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m7:42[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\AnalyticsSection.tsx[24m[0m
+[0m    [2m3:36[22m  [33mwarning[39m  'Grid' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m3:69[22m  [33mwarning[39m  'Divider' is defined but never used       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m6:5[22m   [33mwarning[39m  'Download' is defined but never used      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m11:38[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m45:48[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m114:77[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m149:80[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m189:66[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\ContactSection.tsx[24m[0m
+[0m  [2m3:27[22m  [33mwarning[39m  'Box' is defined but never used           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m6:11[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m7:42[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\DataManagementSection.tsx[24m[0m
+[0m    [2m6:29[22m  [33mwarning[39m  'Grid' is defined but never used                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:41[22m  [33mwarning[39m  'Filter' is defined but never used                   [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m10:15[22m  [33mwarning[39m  'RefreshCcw' is defined but never used               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m35:12[22m  [33mwarning[39m  'selectedRecord' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m149:86[22m  [31merror[39m    Unexpected any. Specify a different type             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\FooterSection.tsx[24m[0m
+[0m   [2m6:11[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m7:42[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m8:81[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m26:42[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\HeaderSection.tsx[24m[0m
+[0m   [2m6:11[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m7:81[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m14:39[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\HeroSection.tsx[24m[0m
+[0m  [2m6:11[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m7:42[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\LogsSection.tsx[24m[0m
+[0m   [2m8:13[22m  [33mwarning[39m  'Filter' is defined but never used                                                                            [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m56:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\MessagesSection.tsx[24m[0m
+[0m   [2m2:88[22m  [33mwarning[39m  'IconButton' is defined but never used    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m3:10[22m  [33mwarning[39m  'Search' is defined but never used        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m3:24[22m  [33mwarning[39m  'CheckCircle' is defined but never used   [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m3:37[22m  [33mwarning[39m  'Clock' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m42:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m79:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\ProfileSection.tsx[24m[0m
+[0m    [2m4:16[22m  [33mwarning[39m  'Mail' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:22[22m  [33mwarning[39m  'Phone' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:29[22m  [33mwarning[39m  'MapPin' is defined but never used        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m64:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m111:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m156:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m191:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\ProjectsManagementSection.tsx[24m[0m
+[0m    [2m5:16[22m   [33mwarning[39m  'Grid' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:30[22m   [33mwarning[39m  'Eye' is defined but never used           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m12:13[22m   [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m125:18[22m   [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m156:18[22m   [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m235:90[22m   [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m307:103[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\RolesSection.tsx[24m[0m
+[0m    [2m8:13[22m  [33mwarning[39m  'Lock' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m30:6[22m   [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m38:31[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m136:62[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\ServicesSection.tsx[24m[0m
+[0m   [2m6:11[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m7:42[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m8:81[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m35:36[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\SettingsSection.tsx[24m[0m
+[0m  [2m3:20[22m  [33mwarning[39m  'useRef' is defined but never used             [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m4:41[22m  [33mwarning[39m  'ClickAwayListener' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m8:11[22m  [31merror[39m    Unexpected any. Specify a different type       [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m9:42[22m  [31merror[39m    Unexpected any. Specify a different type       [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\TransactionsSection.tsx[24m[0m
+[0m    [2m1:20[22m  [33mwarning[39m  'useEffect' is defined but never used                 [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:17[22m  [33mwarning[39m  'Menu' is defined but never used                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:23[22m  [33mwarning[39m  'MenuItem' is defined but never used                  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:58[22m  [33mwarning[39m  'Grid' is defined but never used                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m5:13[22m  [33mwarning[39m  'Divider' is defined but never used                   [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:19[22m  [33mwarning[39m  'Download' is defined but never used                  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:29[22m  [33mwarning[39m  'RotateCcw' is defined but never used                 [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:40[22m  [33mwarning[39m  'CheckCircle' is defined but never used               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:53[22m  [33mwarning[39m  'AlertCircle' is defined but never used               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:66[22m  [33mwarning[39m  'Clock' is defined but never used                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:17[22m  [33mwarning[39m  'TrendingUp' is defined but never used                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:29[22m  [33mwarning[39m  'CreditCard' is defined but never used                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:41[22m  [33mwarning[39m  'Search' is defined but never used                    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m15:11[22m  [31merror[39m    Unexpected any. Specify a different type              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m26:12[22m  [33mwarning[39m  'anchorEl' is assigned a value but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m27:12[22m  [33mwarning[39m  'selectedTxn' is assigned a value but never used      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m29:12[22m  [33mwarning[39m  'loading' is assigned a value but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m29:21[22m  [33mwarning[39m  'setLoading' is assigned a value but never used       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m40:11[22m  [33mwarning[39m  'handleMenuOpen' is assigned a value but never used   [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m45:11[22m  [33mwarning[39m  'handleMenuClose' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m104:52[22m  [31merror[39m    Unexpected any. Specify a different type              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m118:31[22m  [33mwarning[39m  'verifyData' is assigned a value but never used       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m153:50[22m  [31merror[39m    Unexpected any. Specify a different type              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m156:25[22m  [31merror[39m    Unexpected any. Specify a different type              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m229:86[22m  [31merror[39m    Unexpected any. Specify a different type              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\admin\sections\UsersSection.tsx[24m[0m
+[0m    [2m4:59[22m  [33mwarning[39m  'Tooltip' is defined but never used       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m6:48[22m  [33mwarning[39m  'Grid' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m6:54[22m  [33mwarning[39m  'FormControl' is defined but never used   [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m6:67[22m  [33mwarning[39m  'InputLabel' is defined but never used    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m6:79[22m  [33mwarning[39m  'Select' is defined but never used        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:19[22m  [33mwarning[39m  'Eye' is defined but never used           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:24[22m  [33mwarning[39m  'Edit' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:43[22m  [33mwarning[39m  'Key' is defined but never used           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m108:18[22m  [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m140:18[22m  [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m165:18[22m  [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m191:18[22m  [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m311:99[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\UserSidebar.tsx[24m[0m
+[0m  [2m3:10[22m  [33mwarning[39m  'useState' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\sections\DashboardOverview.tsx[24m[0m
+[0m   [2m2:96[22m  [33mwarning[39m  'CircularProgress' is defined but never used                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m3:44[22m  [33mwarning[39m  'AlertCircle' is defined but never used                          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m17:12[22m  [33mwarning[39m  'loading' is assigned a value but never used                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m74:25[22m  [31merror[39m    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m  [2m74:32[22m  [31merror[39m    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\sections\MessagesSection.tsx[24m[0m
+[0m  [2m38:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m59:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\sections\ProfileSection.tsx[24m[0m
+[0m    [2m4:16[22m  [33mwarning[39m  'Mail' is defined but never used          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:22[22m  [33mwarning[39m  'Phone' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:29[22m  [33mwarning[39m  'MapPin' is defined but never used        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:43[22m  [33mwarning[39m  'Building2' is defined but never used     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m64:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m112:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m157:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m192:25[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\sections\ProjectsSection.tsx[24m[0m
+[0m    [2m3:10[22m  [33mwarning[39m  'FolderKanban' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m3:24[22m  [33mwarning[39m  'Clock' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m49:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m79:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m155:90[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\components\user\sections\ServicesSection.tsx[24m[0m
+[0m   [2m2:15[22m  [33mwarning[39m  'Paper' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m45:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m86:23[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m94:22[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\lib\auth.ts[24m[0m
+[0m  [2m10:20[22m  [31merror[39m    Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m26:14[22m  [33mwarning[39m  'error' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\lib\db.ts[24m[0m
+[0m   [2m9:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m12:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\sdevx\next\next\src\lib\mongodb.ts[24m[0m
+[0m  [2m14:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m17:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[31m[1m✖ 144 problems (66 errors, 78 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

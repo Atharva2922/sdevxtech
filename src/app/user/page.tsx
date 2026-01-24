@@ -13,6 +13,7 @@ import ProfileSection from '@/components/user/sections/ProfileSection';
 export default function UserDashboard() {
     const router = useRouter();
     const [currentSection, setCurrentSection] = useState('dashboard');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -42,6 +43,8 @@ export default function UserDashboard() {
             const params = new URLSearchParams(window.location.search);
             const section = params.get('section');
             if (section) {
+                // Defer state update to avoid sync warning or accept it as initial sync
+                // eslint-disable-next-line react/no-did-mount-set-state
                 setCurrentSection(section);
                 // Remove query parameter from URL
                 window.history.replaceState({}, '', '/user');

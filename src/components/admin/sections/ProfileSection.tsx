@@ -61,7 +61,7 @@ export default function ProfileSection() {
                 role: data.user.role || '',
                 image: data.user.image || ''
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Profile fetch error:', error);
             setToast({ open: true, message: 'Failed to load profile', severity: 'error' });
         } finally {
@@ -108,9 +108,9 @@ export default function ProfileSection() {
                 // Dispatch event to update sidebar
                 window.dispatchEvent(new Event('user-updated'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Profile update error:', error);
-            setToast({ open: true, message: error.message || 'Failed to update profile', severity: 'error' });
+            setToast({ open: true, message: error instanceof Error ? error.message : 'Failed to update profile', severity: 'error' });
         } finally {
             setSaving(false);
         }
@@ -153,9 +153,9 @@ export default function ProfileSection() {
 
             setToast({ open: true, message: 'Password changed successfully!', severity: 'success' });
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Password change error:', error);
-            setToast({ open: true, message: error.message || 'Failed to change password', severity: 'error' });
+            setToast({ open: true, message: error instanceof Error ? error.message : 'Failed to change password', severity: 'error' });
         } finally {
             setChangingPassword(false);
         }
@@ -188,9 +188,9 @@ export default function ProfileSection() {
             setProfileData(prev => ({ ...prev, image: data.imageUrl }));
 
             setToast({ open: true, message: 'Photo uploaded! Click Save to apply.', severity: 'success' });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Upload error:', error);
-            setToast({ open: true, message: error.message || 'Failed to upload photo', severity: 'error' });
+            setToast({ open: true, message: error instanceof Error ? error.message : 'Failed to upload photo', severity: 'error' });
         }
     };
 
@@ -273,7 +273,7 @@ export default function ProfileSection() {
                 </Box>
 
                 <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Full Name *
                         </Typography>
@@ -286,7 +286,7 @@ export default function ProfileSection() {
                         />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Email Address
                         </Typography>
@@ -298,7 +298,7 @@ export default function ProfileSection() {
                         />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Phone Number
                         </Typography>
@@ -312,7 +312,7 @@ export default function ProfileSection() {
                         />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Role
                         </Typography>
@@ -324,7 +324,7 @@ export default function ProfileSection() {
                         />
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Department
                         </Typography>
@@ -345,7 +345,7 @@ export default function ProfileSection() {
                     Change Password
                 </Typography>
                 <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Current Password
                         </Typography>
@@ -357,7 +357,7 @@ export default function ProfileSection() {
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             New Password
                         </Typography>
@@ -369,7 +369,7 @@ export default function ProfileSection() {
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="caption" color="text.secondary" mb={0.5} display="block">
                             Confirm Password
                         </Typography>
@@ -381,7 +381,7 @@ export default function ProfileSection() {
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                         <Button
                             variant="outlined"
                             onClick={handleChangePassword}

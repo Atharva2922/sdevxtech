@@ -3,14 +3,16 @@
 import { Grid, TextField, Box } from '@mui/material';
 
 interface ContactSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleChange: (field: string, value: any) => void;
 }
 
 export default function ContactSection({ data, handleChange }: ContactSectionProps) {
     return (
         <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
                 <TextField
                     fullWidth
                     label="Heading"
@@ -19,7 +21,7 @@ export default function ContactSection({ data, handleChange }: ContactSectionPro
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                 />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
                 <TextField
                     fullWidth
                     multiline
@@ -30,7 +32,7 @@ export default function ContactSection({ data, handleChange }: ContactSectionPro
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                 />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                     fullWidth
                     label="Button Label"
@@ -39,7 +41,7 @@ export default function ContactSection({ data, handleChange }: ContactSectionPro
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                 />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                     fullWidth
                     label="Email Address"

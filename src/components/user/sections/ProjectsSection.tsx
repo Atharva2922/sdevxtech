@@ -46,8 +46,8 @@ export default function ProjectsSection() {
 
             const data = await response.json();
             setProjects(data.projects || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch projects');
         } finally {
             setLoading(false);
         }
@@ -76,8 +76,8 @@ export default function ProjectsSection() {
             await fetchProjects();
             setOpenDialog(false);
             setFormData({ name: '', description: '', dueDate: '', type: '' });
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : 'Failed to request project');
         } finally {
             setRequestLoading(false);
         }
@@ -152,6 +152,7 @@ export default function ProjectsSection() {
                                             <Chip
                                                 label={project.status}
                                                 size="small"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 color={getStatusColor(project.status) as any}
                                                 sx={{ borderRadius: '6px' }}
                                             />

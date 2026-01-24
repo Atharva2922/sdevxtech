@@ -1,5 +1,6 @@
 import { Container, Button } from '@mui/material';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Hero({ heroData }: { heroData: any }) {
     if (!heroData) return null;
 

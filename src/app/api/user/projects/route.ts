@@ -4,7 +4,7 @@ import Project from '@/models/Project';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -25,10 +25,10 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ projects });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Fetch User Projects Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch projects', details: error.message },
+            { error: 'Failed to fetch projects', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

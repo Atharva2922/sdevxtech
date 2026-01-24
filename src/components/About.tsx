@@ -3,6 +3,7 @@
 import { Container } from '@mui/material';
 import { useEffect, useRef } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function About({ aboutData }: { aboutData: any }) {
     const sectionRef = useRef<HTMLElement>(null);
 

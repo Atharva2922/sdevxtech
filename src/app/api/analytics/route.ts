@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -99,7 +99,7 @@ export async function GET(req: Request) {
             }
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Analytics error:', error);
         return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
     }

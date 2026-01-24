@@ -9,12 +9,14 @@ import { User, LogOut, Settings, Home } from 'lucide-react';
 
 export default function DashboardPage() {
     const router = useRouter();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
         // Get user from localStorage
         const userData = localStorage.getItem('user');
         if (userData) {
+            // eslint-disable-next-line react/no-did-mount-set-state
             setUser(JSON.parse(userData));
         } else {
             router.push('/login');

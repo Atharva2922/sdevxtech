@@ -35,8 +35,8 @@ export default function MessagesSection() {
             if (!res.ok) throw new Error('Failed to fetch messages');
             const data = await res.json();
             setMessages(data.messages || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch messages');
         } finally {
             setLoading(false);
         }
@@ -56,8 +56,8 @@ export default function MessagesSection() {
             await fetchMessages();
             setOpenDialog(false);
             setFormData({ subject: '', message: '' });
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : 'Failed to send message');
         } finally {
             setSending(false);
         }

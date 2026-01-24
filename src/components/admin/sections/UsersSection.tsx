@@ -1,9 +1,11 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     IconButton, Menu, MenuItem, Chip, Avatar, Typography, Tooltip, Stack,
     TextField, InputAdornment, Button, Divider, CircularProgress, Dialog,
-    DialogTitle, DialogContent, DialogActions, Grid, FormControl, InputLabel, Select, Snackbar, Alert
+    DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, Snackbar, Alert
 } from '@mui/material';
 import {
     MoreVertical, Eye, Edit, Ban, Trash2, Key, Shield, Search, Filter, Plus, CheckCircle
@@ -58,7 +60,7 @@ export default function UsersSection() {
                     setToast({ open: true, message: 'Failed to fetch users', severity: 'error' });
                 }
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error loading users:', error);
             setToast({ open: true, message: 'Error loading users list', severity: 'error' });
         } finally {
@@ -105,7 +107,7 @@ export default function UsersSection() {
                 const error = await res.json();
                 setToast({ open: true, message: error.error || 'Failed to create user', severity: 'error' });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             setToast({ open: true, message: 'Error creating user', severity: 'error' });
         } finally {
             setActionLoading(false);
@@ -137,7 +139,7 @@ export default function UsersSection() {
             } else {
                 setToast({ open: true, message: `User ${status === 'Blocked' ? 'blocked' : 'activated'}`, severity: 'success' });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             setToast({ open: true, message: 'Error updating user', severity: 'error' });
             fetchUsers();
         }
@@ -162,7 +164,7 @@ export default function UsersSection() {
                 const error = await res.json();
                 setToast({ open: true, message: error.error || 'Failed to delete user', severity: 'error' });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             setToast({ open: true, message: 'Error deleting user', severity: 'error' });
         }
     };
@@ -188,7 +190,7 @@ export default function UsersSection() {
                 const error = await res.json();
                 setToast({ open: true, message: error.error || 'Failed to update role', severity: 'error' });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             setToast({ open: true, message: 'Error updating role', severity: 'error' });
         }
     };
@@ -308,6 +310,7 @@ export default function UsersSection() {
                                             <Chip
                                                 label={user.status || 'Active'}
                                                 size="small"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 color={getStatusColor(user.status || 'Active') as any}
                                                 variant="outlined"
                                                 sx={{ fontWeight: 500, borderRadius: '6px' }}

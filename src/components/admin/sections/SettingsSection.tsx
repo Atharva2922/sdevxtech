@@ -5,12 +5,15 @@ import { Grid, TextField, Box, Popover, ClickAwayListener } from '@mui/material'
 import { HexColorPicker } from 'react-colorful';
 
 interface SettingsSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleChange: (field: string, value: any) => void;
 }
 
 export default function SettingsSection({ data, handleChange }: SettingsSectionProps) {
     const [activeColorField, setActiveColorField] = useState<string | null>(null);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleColorClick = (event: React.MouseEvent<HTMLElement>, field: string) => {
         setAnchorEl(event.currentTarget);

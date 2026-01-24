@@ -3,8 +3,11 @@
 import { Box, Grid, TextField, Paper, Typography } from '@mui/material';
 
 interface ServicesSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleChange: (field: string, value: any) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleArrayChange: (arrayName: string, index: number, field: string, value: any) => void;
 }
 
@@ -12,7 +15,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
     return (
         <Box>
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <TextField
                         fullWidth
                         label="Section Heading"
@@ -21,7 +24,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <TextField
                         fullWidth
                         label="Sub Heading"
@@ -31,7 +34,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
                     />
                 </Grid>
             </Grid>
-
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {data.items.map((item: any, index: number) => (
                 <Paper
                     key={index}
@@ -52,7 +55,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
                         Service {index + 1}
                     </Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 fullWidth
                                 label="Title"
@@ -61,7 +64,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
                                 onChange={(e) => handleArrayChange('items', index, 'title', e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 fullWidth
                                 label="Icon (Lucide Name)"
@@ -70,7 +73,7 @@ export default function ServicesSection({ data, handleChange, handleArrayChange 
                                 onChange={(e) => handleArrayChange('items', index, 'icon', e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth
                                 multiline

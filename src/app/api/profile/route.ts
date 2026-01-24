@@ -50,10 +50,10 @@ export async function GET(req: NextRequest) {
                 createdAt: user.createdAt
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Profile fetch error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch profile', details: error.message },
+            { error: 'Failed to fetch profile', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
@@ -135,10 +135,10 @@ export async function PUT(req: NextRequest) {
                 createdAt: updatedUser.createdAt
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Profile update error:', error);
         return NextResponse.json(
-            { error: 'Failed to update profile', details: error.message },
+            { error: 'Failed to update profile', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

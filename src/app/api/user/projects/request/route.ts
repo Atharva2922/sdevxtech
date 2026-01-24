@@ -50,10 +50,10 @@ export async function POST(req: NextRequest) {
             project: newProject
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Project Request Error:', error);
         return NextResponse.json(
-            { error: 'Failed to request project', details: error.message },
+            { error: 'Failed to request project', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

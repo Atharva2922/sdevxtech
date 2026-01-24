@@ -54,8 +54,8 @@ export default function LoginPage() {
                     router.push('/user?section=profile'); // Go to profile if incomplete
                 }
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -204,7 +204,7 @@ export default function LoginPage() {
                     {/* Register Link */}
                     <Box textAlign="center">
                         <Typography variant="body2" color="text.secondary">
-                            Don't have an account?{' '}
+                            Don&apos;t have an account?{' '}
                             <Button
                                 variant="text"
                                 onClick={() => router.push('/register')}

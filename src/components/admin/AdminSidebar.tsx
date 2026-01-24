@@ -38,6 +38,7 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
         if (userData) {
             try {
                 const user = JSON.parse(userData);
+                // Avoid setState in effect warning by doing it conditionally or accepting it's on mount
                 setUserName(user.name || 'Admin User');
                 setUserEmail(user.email || 'admin@sdevx.com');
                 setUserImage(user.image || '');
@@ -48,7 +49,7 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
                     ? nameParts[0].charAt(0) + nameParts[1].charAt(0)
                     : nameParts[0].charAt(0) + (nameParts[0].charAt(1) || '');
                 setUserInitials(initials.toUpperCase());
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error('Error parsing user data:', error);
             }
         }

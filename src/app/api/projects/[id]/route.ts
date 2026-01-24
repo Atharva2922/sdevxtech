@@ -42,9 +42,9 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         );
 
         return NextResponse.json({ project: updatedProject });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating project:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
     }
 }
 
@@ -76,8 +76,8 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
         }
 
         return NextResponse.json({ message: 'Project deleted successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting project:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
     }
 }

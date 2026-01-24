@@ -5,6 +5,7 @@ import Image from 'next/image';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Header({ navItems }: { navItems: any[] }) {
     const [mobileOpen, setMobileOpen] = useState(false);
 

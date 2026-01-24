@@ -3,11 +3,11 @@ import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     IconButton, Menu, MenuItem, Chip, Typography, Stack,
     TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent,
-    DialogActions, Divider, Grid
+    DialogActions, Divider
 } from '@mui/material';
 import {
-    MoreVertical, Edit, Trash2, Search, Filter, Plus, Upload, FileSpreadsheet,
-    Download, RefreshCcw, Truck, MapPin, Calendar
+    MoreVertical, Edit, Trash2, Search, Plus, Upload, FileSpreadsheet,
+    Download, Truck, MapPin, Calendar
 } from 'lucide-react';
 
 // Mock Data Type
@@ -146,6 +146,7 @@ export default function DataManagementSection() {
                                             <Chip
                                                 label={row.status}
                                                 size="small"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 color={getStatusColor(row.status) as any}
                                                 variant="outlined"
                                                 sx={{ fontWeight: 500, borderRadius: '6px' }}

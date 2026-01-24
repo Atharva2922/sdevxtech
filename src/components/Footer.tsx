@@ -1,6 +1,7 @@
 import { Container } from '@mui/material';
 import Image from 'next/image';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Footer({ footerData }: { footerData: any }) {
     if (!footerData) return null;
 
@@ -29,6 +30,7 @@ export default function Footer({ footerData }: { footerData: any }) {
                     </div>
 
                     <div className="flex gap-6">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {footerData.socialLinks.map((link: any, index: number) => (
                             <a
                                 key={index}

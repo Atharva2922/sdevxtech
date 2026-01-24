@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -12,6 +14,7 @@ import {
 // Define Transaction Interface matching our new Model
 interface Transaction {
     _id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user: any;
     amount: number;
     currency: string;
@@ -101,6 +104,7 @@ export default function TransactionsSection() {
                 name: 'SDEVX Tech',
                 description: paymentDescription || 'Transaction',
                 order_id: orderData.id,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 handler: async function (response: any) {
                     // 4. Verify Payment
                     try {
@@ -150,12 +154,13 @@ export default function TransactionsSection() {
                 },
             };
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const paymentObject = new (window as any).Razorpay(options);
             paymentObject.open();
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Payment Error:', error);
-            alert(error.message || 'Payment Failed');
+            alert(error instanceof Error ? error.message : 'Payment Failed');
         } finally {
             setProcessing(false);
         }
@@ -226,6 +231,7 @@ export default function TransactionsSection() {
                                             <Chip
                                                 label={txn.status}
                                                 size="small"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 color={getStatusColor(txn.status) as any}
                                                 variant="outlined"
                                             />

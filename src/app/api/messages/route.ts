@@ -5,7 +5,7 @@ import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 // GET: Fetch user's messages
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
             .sort({ createdAt: -1 });
 
         return NextResponse.json({ messages });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Error fetching messages:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
@@ -65,9 +65,9 @@ export async function POST(req: NextRequest) {
         });
 
         return NextResponse.json({ message }, { status: 201 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating message:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
     }
 }
 
@@ -101,8 +101,8 @@ export async function PUT(req: NextRequest) {
         }
 
         return NextResponse.json({ message });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating message:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
     }
 }

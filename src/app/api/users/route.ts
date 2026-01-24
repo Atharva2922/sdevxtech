@@ -8,7 +8,7 @@ import { createLog } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -84,8 +84,8 @@ export async function POST(req: Request) {
         delete userResponse.password;
 
         return NextResponse.json({ user: userResponse }, { status: 201 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating user:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
     }
 }

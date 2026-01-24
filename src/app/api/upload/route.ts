@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         const uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles');
         try {
             await mkdir(uploadDir, { recursive: true });
-        } catch (e) {
+        } catch {
             // Ignore error if directory exists
         }
 
@@ -57,8 +57,11 @@ export async function POST(req: NextRequest) {
             imageUrl
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Upload error:', error);
-        return NextResponse.json({ error: 'Upload failed', details: error.message }, { status: 500 });
+        return NextResponse.json(
+            { error: 'Upload failed', details: error instanceof Error ? error.message : 'Unknown error' },
+            { status: 500 }
+        );
     }
 }

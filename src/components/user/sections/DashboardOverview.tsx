@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Grid, Card, CardContent, LinearProgress, Chip, Stack, Button, CircularProgress } from '@mui/material';
 import { FolderKanban, Clock, CheckCircle, AlertCircle, TrendingUp, MessageSquare } from 'lucide-react';
 
-export default function DashboardOverview() {
+interface DashboardOverviewProps {
+    onNavigate?: (section: string) => void;
+}
+
+export default function DashboardOverview({ onNavigate }: DashboardOverviewProps) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [stats, setStats] = useState<any[]>([
         { label: 'Active Projects', value: '-', icon: FolderKanban, color: '#667eea', change: 'Loading...' },
         { label: 'Pending Tasks', value: '-', icon: Clock, color: '#f59e0b', change: 'Loading...' },
@@ -11,6 +16,7 @@ export default function DashboardOverview() {
     ]);
     const [loading, setLoading] = useState(true);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [recentProjects, setRecentProjects] = useState<any[]>([]);
 
     useEffect(() => {
@@ -21,6 +27,7 @@ export default function DashboardOverview() {
                 if (statsRes.ok) {
                     const data = await statsRes.json();
                     if (data.stats) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const enhancedStats = data.stats.map((s: any) => ({
                             ...s,
                             icon: getIcon(s.label)
@@ -64,7 +71,7 @@ export default function DashboardOverview() {
                     Welcome Back! 👋
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Here's what's happening with your projects today
+                    Here&apos;s what&apos;s happening with your projects today
                 </Typography>
             </Box>
 
@@ -104,7 +111,11 @@ export default function DashboardOverview() {
                     <Typography variant="h6" fontWeight="bold">
                         Recent Projects
                     </Typography>
-                    <Button variant="text" sx={{ textTransform: 'none' }}>
+                    <Button
+                        variant="text"
+                        sx={{ textTransform: 'none' }}
+                        onClick={() => onNavigate?.('projects')}
+                    >
                         View All
                     </Button>
                 </Box>
@@ -164,6 +175,11 @@ export default function DashboardOverview() {
                             </Box>
                         </Box>
                     ))}
+                    {recentProjects.length === 0 && (
+                        <Typography variant="body2" color="text.secondary" textAlign="center" py={2}>
+                            No projects found.
+                        </Typography>
+                    )}
                 </Stack>
             </Paper>
 
@@ -177,6 +193,7 @@ export default function DashboardOverview() {
                         <Button
                             fullWidth
                             variant="outlined"
+                            onClick={() => onNavigate?.('services')}
                             sx={{
                                 py: 2,
                                 borderRadius: '12px',
@@ -191,6 +208,7 @@ export default function DashboardOverview() {
                         <Button
                             fullWidth
                             variant="outlined"
+                            onClick={() => onNavigate?.('documents')}
                             sx={{
                                 py: 2,
                                 borderRadius: '12px',
@@ -205,6 +223,7 @@ export default function DashboardOverview() {
                         <Button
                             fullWidth
                             variant="outlined"
+                            onClick={() => onNavigate?.('messages')}
                             sx={{
                                 py: 2,
                                 borderRadius: '12px',
@@ -219,6 +238,7 @@ export default function DashboardOverview() {
                         <Button
                             fullWidth
                             variant="outlined"
+                            onClick={() => onNavigate?.('settings')}
                             sx={{
                                 py: 2,
                                 borderRadius: '12px',

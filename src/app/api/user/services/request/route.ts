@@ -44,10 +44,10 @@ export async function POST(req: NextRequest) {
             request: newRequest
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Service Request Error:', error);
         return NextResponse.json(
-            { error: 'Failed to request service', details: error.message },
+            { error: 'Failed to request service', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

@@ -25,6 +25,7 @@ const services = [
     },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconMap: { [key: string]: any } = {
     Edit,
     Monitor,

@@ -42,8 +42,8 @@ export default function ServicesSection() {
 
             const data = await response.json();
             setServices(data.services || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch services');
         } finally {
             setLoading(false);
         }
@@ -83,14 +83,15 @@ export default function ServicesSection() {
             setOpenDialog(false);
             setRequestDetails('');
             setSelectedService(null);
-        } catch (err: any) {
-            setToast({ open: true, message: err.message, severity: 'error' });
+        } catch (err: unknown) {
+            setToast({ open: true, message: err instanceof Error ? err.message : 'Request failed', severity: 'error' });
         } finally {
             setRequestLoading(false);
         }
     };
 
     const getIcon = (iconName: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const icons: any = { Code, Palette, Search, Smartphone, TrendingUp, Shield };
         return icons[iconName] || Code;
     };

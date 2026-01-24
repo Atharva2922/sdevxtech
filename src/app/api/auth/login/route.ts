@@ -95,10 +95,10 @@ export async function POST(req: NextRequest) {
         });
 
         return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Login error:', error);
         return NextResponse.json(
-            { error: 'Login failed', details: error.message },
+            { error: 'Login failed', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

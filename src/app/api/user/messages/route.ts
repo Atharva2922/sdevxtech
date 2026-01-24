@@ -5,7 +5,7 @@ import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 // GET: Fetch messages for the user
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -36,10 +36,10 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ messages });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Fetch Messages Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch messages', details: error.message },
+            { error: 'Failed to fetch messages', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
@@ -94,10 +94,10 @@ export async function POST(req: NextRequest) {
             data: newMessage
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Send Message Error:', error);
         return NextResponse.json(
-            { error: 'Failed to send message', details: error.message },
+            { error: 'Failed to send message', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

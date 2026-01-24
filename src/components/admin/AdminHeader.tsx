@@ -14,6 +14,7 @@ interface AdminHeaderProps {
 export default function AdminHeader({ title, description, onSave, showSaveButton = false, isSaving = false, onLogout }: AdminHeaderProps) {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [unreadCount, setUnreadCount] = useState(0);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [recentMessages, setRecentMessages] = useState<any[]>([]);
 
     useEffect(() => {
@@ -23,6 +24,7 @@ export default function AdminHeader({ title, description, onSave, showSaveButton
                 const res = await fetch('/api/admin/messages');
                 if (res.ok) {
                     const data = await res.json();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const unread = data.messages.filter((m: any) => !m.isRead);
                     setUnreadCount(unread.length);
                     setRecentMessages(unread.slice(0, 5)); // Show top 5 unread

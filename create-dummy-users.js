@@ -22,7 +22,7 @@ async function createDummyUser() {
         const hashedPassword = await bcrypt.hash('admin123', 10);
 
         // Create admin user
-        const adminUser = await User.create({
+        await User.create({
             name: 'Admin User',
             email: 'admin@test.com',
             password: hashedPassword,
@@ -37,7 +37,7 @@ async function createDummyUser() {
 
         // Create regular user
         const regularPassword = await bcrypt.hash('user123', 10);
-        const regularUser = await User.create({
+        await User.create({
             name: 'Regular User',
             email: 'user@test.com',
             password: regularPassword,

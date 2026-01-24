@@ -66,10 +66,13 @@ export async function POST(req: NextRequest) {
             description: transaction.description
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Payment Init Error:', JSON.stringify(error, null, 2));
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const details = (error as any)?.error?.description || errorMessage;
         return NextResponse.json(
-            { error: 'Failed to initiate payment', details: error.error?.description || error.message },
+            { error: 'Failed to initiate payment', details },
             { status: 500 }
         );
     }

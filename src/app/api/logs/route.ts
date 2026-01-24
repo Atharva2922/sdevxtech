@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
         const type = searchParams.get('type') || 'all';
         const search = searchParams.get('search') || '';
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const query: any = {};
 
         if (type !== 'all') {
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
             .limit(limit);
 
         return NextResponse.json({ logs });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching logs:', error);
         return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
     }

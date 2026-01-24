@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Stack, Avatar, Chip, CircularProgress, Alert, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
-import { Search, Mail, CheckCircle, Clock } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 interface Message {
     _id: string;
@@ -39,8 +39,8 @@ export default function AdminMessagesSection() {
             if (!res.ok) throw new Error('Failed to fetch messages');
             const data = await res.json();
             setMessages(data.messages || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -76,8 +76,8 @@ export default function AdminMessagesSection() {
             setOpenReplyDialog(false);
             setReplyMessage('');
             // Optionally refresh messages if you want to show the sent reply in a thread view
-        } catch (err: any) {
-            setToast({ open: true, message: err.message, severity: 'error' });
+        } catch (err: unknown) {
+            setToast({ open: true, message: err instanceof Error ? err.message : 'Failed to send', severity: 'error' });
         } finally {
             setSending(false);
         }

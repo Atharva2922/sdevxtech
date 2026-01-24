@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Box, Paper, Typography, Stack, Tabs, Tab, Chip, TextField, InputAdornment,
     List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, CircularProgress,
     Button
 } from '@mui/material';
 import {
-    Search, Filter, Info, AlertTriangle, AlertCircle, Clock, User, Server, Database,
+    Search, Info, AlertTriangle, AlertCircle, Clock, User, Server, Database,
     RefreshCcw, CheckCircle
 } from 'lucide-react';
 
@@ -26,7 +26,7 @@ export default function LogsSection() {
     const [logs, setLogs] = useState<Log[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
@@ -46,7 +46,7 @@ export default function LogsSection() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchTerm, filter]);
 
     useEffect(() => {
         const timer = setTimeout(() => {

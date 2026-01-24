@@ -9,6 +9,11 @@ export default function ColorPicker() {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [color, setColor] = useState('#6366f1');
 
+    const applyColor = (newColor: string) => {
+        document.documentElement.style.setProperty('--primary-color', newColor);
+        localStorage.setItem('themeColor', newColor);
+    };
+
     useEffect(() => {
         // Load saved color from localStorage
         const savedColor = localStorage.getItem('themeColor');
@@ -17,11 +22,6 @@ export default function ColorPicker() {
             applyColor(savedColor);
         }
     }, []);
-
-    const applyColor = (newColor: string) => {
-        document.documentElement.style.setProperty('--primary-color', newColor);
-        localStorage.setItem('themeColor', newColor);
-    };
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);

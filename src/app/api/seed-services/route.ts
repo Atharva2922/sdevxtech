@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Service from '@/models/Service';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
     try {
         await connectDB();
 
@@ -83,10 +83,10 @@ export async function POST(req: NextRequest) {
             },
             { status: 201 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error seeding services:', error);
         return NextResponse.json(
-            { error: error.message || 'Internal Server Error' },
+            { error: error instanceof Error ? error.message : 'Internal Server Error' },
             { status: 500 }
         );
     }

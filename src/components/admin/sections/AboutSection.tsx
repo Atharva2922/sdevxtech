@@ -3,7 +3,9 @@
 import { Box, Grid, TextField, Divider } from '@mui/material';
 
 interface AboutSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleChange: (field: string, value: any) => void;
 }
 

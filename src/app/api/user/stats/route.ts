@@ -4,7 +4,7 @@ import Project from '@/models/Project';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         const userId = payload.userId;
 
         // Fetch Stats
-        const totalProjects = await Project.countDocuments({ userId });
+        // const totalProjects = await Project.countDocuments({ userId }); // Unused
         const activeProjects = await Project.countDocuments({ userId, status: { $in: ['In Progress', 'Planning'] } });
         const completedProjects = await Project.countDocuments({ userId, status: 'Completed' });
 
@@ -40,10 +40,10 @@ export async function GET(req: NextRequest) {
             ]
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Fetch User Stats Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch stats', details: error.message },
+            { error: 'Failed to fetch stats', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

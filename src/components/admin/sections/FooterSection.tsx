@@ -3,8 +3,11 @@
 import { Box, Grid, TextField, Divider, Paper } from '@mui/material';
 
 interface FooterSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleChange: (field: string, value: any) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleArrayChange: (arrayName: string, index: number, field: string, value: any) => void;
 }
 
@@ -12,7 +15,7 @@ export default function FooterSection({ data, handleChange, handleArrayChange }:
     return (
         <Box>
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <TextField
                         fullWidth
                         label="Copyright Text"
@@ -23,6 +26,7 @@ export default function FooterSection({ data, handleChange, handleArrayChange }:
                 </Grid>
             </Grid>
             <Divider sx={{ mb: 3 }} textAlign="left">Social Links</Divider>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {data.socialLinks.map((item: any, index: number) => (
                 <Paper
                     key={index}

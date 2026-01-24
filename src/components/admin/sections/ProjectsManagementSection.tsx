@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import {
     Box, Paper, Typography, Stack, Button, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, IconButton, Chip, Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, Grid, MenuItem, CircularProgress, Snackbar, Alert
+    TextField, MenuItem, CircularProgress, Snackbar, Alert
 } from '@mui/material';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 
 interface Project {
     _id: string;
     name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     userId: any; // Populated user object or ID
     clientName?: string; // Derived for display
     status: 'Planning' | 'In Progress' | 'Review' | 'Completed';
@@ -232,6 +233,7 @@ export default function ProjectsManagementSection() {
                                             <Chip
                                                 label={project.status}
                                                 size="small"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 color={getStatusColor(project.status) as any}
                                                 sx={{ borderRadius: '6px' }}
                                             />
@@ -304,6 +306,7 @@ export default function ProjectsManagementSection() {
                                 select
                                 label="Status"
                                 value={formData.status}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                             >

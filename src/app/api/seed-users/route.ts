@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
     try {
         await connectDB();
 
@@ -59,10 +59,10 @@ export async function POST(req: NextRequest) {
             },
             { status: 201 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating dummy users:', error);
         return NextResponse.json(
-            { error: 'Failed to create users', details: error.message },
+            { error: 'Failed to create users', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

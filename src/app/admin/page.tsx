@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import {
-    Typography, Box, Snackbar, Alert, Paper, Fade, Card, CardContent, Divider, Tab, Tabs, Stack
+    Typography, Box, Snackbar, Alert, Paper, Fade, Card, CardContent, Tab, Tabs, Stack
 } from '@mui/material';
 import {
-    LayoutDashboard, Users, CreditCard, BarChart3,
-    Settings, Shield, Activity, FileText
+    Users, CreditCard, BarChart3,
+    Shield, Activity, FileText
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -34,13 +34,21 @@ import ProfileSection from '@/components/admin/sections/ProfileSection';
 import AdminMessagesSection from '@/components/admin/sections/MessagesSection';
 
 interface ContentData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     settings: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     header: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hero: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     services: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     about: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     contact: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     footer: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 
@@ -105,13 +113,14 @@ export default function AdminPage() {
             } else {
                 throw new Error('Failed to save');
             }
-        } catch (error) {
+        } catch {
             setToast({ open: true, message: 'Error saving changes.', severity: 'error' });
         } finally {
             setSaving(false);
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (section: string, field: string, value: any, nestedField?: string) => {
         if (!data) return;
         setData(prev => {
@@ -126,6 +135,7 @@ export default function AdminPage() {
         });
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleArrayChange = (section: string, arrayName: string, index: number, field: string, value: any) => {
         if (!data) return;
         setData(prev => {

@@ -74,10 +74,10 @@ export async function POST(req: NextRequest) {
             success: true,
             message: 'Password changed successfully'
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Password change error:', error);
         return NextResponse.json(
-            { error: 'Failed to change password', details: error.message },
+            { error: 'Failed to change password', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

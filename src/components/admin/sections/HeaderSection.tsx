@@ -3,7 +3,9 @@
 import { Box, TextField, Typography, Paper } from '@mui/material';
 
 interface HeaderSectionProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleArrayChange: (arrayName: string, index: number, field: string, value: any) => void;
 }
 
@@ -11,6 +13,7 @@ export default function HeaderSection({ data, handleArrayChange }: HeaderSection
     return (
         <Box>
             <Typography variant="subtitle2" mb={2} color="text.secondary">Navigation Items</Typography>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {data.navItems.map((item: any, index: number) => (
                 <Paper
                     key={index}

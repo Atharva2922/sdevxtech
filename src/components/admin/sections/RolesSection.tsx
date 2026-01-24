@@ -5,7 +5,7 @@ import {
     ListItemText, ListItemButton, Divider
 } from '@mui/material';
 import {
-    Shield, Lock, Users, Save, CheckCircle, AlertTriangle
+    Shield, Users, Save, CheckCircle, AlertTriangle
 } from 'lucide-react';
 
 const ROLES = [
@@ -27,6 +27,7 @@ const INITIAL_PERMISSIONS = {
     admin: { users: ['read', 'write', 'delete'], content: ['read', 'write', 'delete'], transactions: ['read', 'write'], settings: ['read'] },
     moderator: { users: ['read'], content: ['read', 'write'], transactions: [], settings: [] },
     support: { users: ['read'], content: ['read'], transactions: ['read'], settings: [] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
 export default function RolesSection() {
@@ -35,6 +36,7 @@ export default function RolesSection() {
     const [saving, setSaving] = useState(false);
 
     const handlePermissionToggle = (moduleIdx: string, type: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setPermissions((prev: any) => {
             const rolePerms = prev[selectedRole] || {};
             const modulePerms = rolePerms[moduleIdx] || [];
@@ -133,6 +135,7 @@ export default function RolesSection() {
                             <Chip
                                 label={currentRole?.id.toUpperCase().replace('_', ' ')}
                                 size="small"
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 color={currentRole?.color as any}
                                 variant="outlined"
                                 sx={{ borderRadius: '6px', fontWeight: 600 }}

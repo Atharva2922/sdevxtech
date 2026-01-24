@@ -1,0 +1,198 @@
+﻿
+> next@0.1.0 lint
+> eslint
+
+
+D:\sdevx\next\next\src\app\api\admin\messages\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\auth\logout\route.ts
+  3:28  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\debug-users\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\seed-services\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\seed-users\route.ts
+   1:10  warning  'NextRequest' is defined but never used           @typescript-eslint/no-unused-vars
+  28:15  warning  'adminUser' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  37:15  warning  'regularUser' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\user\projects\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\api\user\stats\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\app\dashboard\page.tsx
+  19:13  warning  Unused eslint-disable directive (no problems were reported from 'react/no-did-mount-set-state')
+  20:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\sdevx\next\next\src\app\dashboard\page.tsx:20:13
+  18 |         if (userData) {
+  19 |             // eslint-disable-next-line react/no-did-mount-set-state
+> 20 |             setUser(JSON.parse(userData));
+     |             ^^^^^^^ Avoid calling setState() directly within an effect
+  21 |         } else {
+  22 |             router.push('/login');
+  23 |         }  react-hooks/set-state-in-effect
+
+D:\sdevx\next\next\src\app\user\page.tsx
+  47:17  warning  Unused eslint-disable directive (no problems were reported from 'react/no-did-mount-set-state')
+  48:17  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\sdevx\next\next\src\app\user\page.tsx:48:17
+  46 |                 // Defer state update to avoid sync warning or accept it as initial sync
+  47 |                 // eslint-disable-next-line react/no-did-mount-set-state
+> 48 |                 setCurrentSection(section);
+     |                 ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |                 // Remove query parameter from URL
+  50 |                 window.history.replaceState({}, '', '/user');
+  51 |             }  react-hooks/set-state-in-effect
+
+D:\sdevx\next\next\src\components\ColorPicker.tsx
+  21:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\sdevx\next\next\src\components\ColorPicker.tsx:21:13
+  19 |         const savedColor = localStorage.getItem('themeColor');
+  20 |         if (savedColor) {
+> 21 |             setColor(savedColor);
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |             applyColor(savedColor);
+  23 |         }
+  24 |     }, []);  react-hooks/set-state-in-effect
+
+D:\sdevx\next\next\src\components\admin\AdminSidebar.tsx
+  42:17  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\sdevx\next\next\src\components\admin\AdminSidebar.tsx:42:17
+  40 |                 const user = JSON.parse(userData);
+  41 |                 // Avoid setState in effect warning by doing it conditionally or accepting it's on mount
+> 42 |                 setUserName(user.name || 'Admin User');
+     |                 ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  43 |                 setUserEmail(user.email || 'admin@sdevx.com');
+  44 |                 setUserImage(user.image || '');
+  45 |  react-hooks/set-state-in-effect
+
+D:\sdevx\next\next\src\components\admin\sections\AboutSection.tsx
+  3:15  warning  'Grid' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\AnalyticsSection.tsx
+  3:36  warning  'Grid' is defined but never used      @typescript-eslint/no-unused-vars
+  3:69  warning  'Divider' is defined but never used   @typescript-eslint/no-unused-vars
+  6:5   warning  'Download' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\ContactSection.tsx
+  3:27  warning  'Box' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\DataManagementSection.tsx
+  35:12  warning  'selectedRecord' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\LogsSection.tsx
+  56:8  warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\sdevx\next\next\src\components\admin\sections\MessagesSection.tsx
+  2:88  warning  'IconButton' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\ProfileSection.tsx
+  4:16  warning  'Mail' is defined but never used    @typescript-eslint/no-unused-vars
+  4:22  warning  'Phone' is defined but never used   @typescript-eslint/no-unused-vars
+  4:29  warning  'MapPin' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\ProjectsManagementSection.tsx
+  126:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  157:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\SettingsSection.tsx
+  3:20  warning  'useRef' is defined but never used             @typescript-eslint/no-unused-vars
+  4:41  warning  'ClickAwayListener' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\TransactionsSection.tsx
+    1:20  warning  'useEffect' is defined but never used                 @typescript-eslint/no-unused-vars
+    4:17  warning  'Menu' is defined but never used                      @typescript-eslint/no-unused-vars
+    4:23  warning  'MenuItem' is defined but never used                  @typescript-eslint/no-unused-vars
+    4:58  warning  'Grid' is defined but never used                      @typescript-eslint/no-unused-vars
+    5:13  warning  'Divider' is defined but never used                   @typescript-eslint/no-unused-vars
+    8:19  warning  'Download' is defined but never used                  @typescript-eslint/no-unused-vars
+    8:29  warning  'RotateCcw' is defined but never used                 @typescript-eslint/no-unused-vars
+    8:40  warning  'CheckCircle' is defined but never used               @typescript-eslint/no-unused-vars
+    8:53  warning  'AlertCircle' is defined but never used               @typescript-eslint/no-unused-vars
+    8:66  warning  'Clock' is defined but never used                     @typescript-eslint/no-unused-vars
+    9:17  warning  'TrendingUp' is defined but never used                @typescript-eslint/no-unused-vars
+    9:29  warning  'CreditCard' is defined but never used                @typescript-eslint/no-unused-vars
+    9:41  warning  'Search' is defined but never used                    @typescript-eslint/no-unused-vars
+   27:12  warning  'anchorEl' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   28:12  warning  'selectedTxn' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   30:12  warning  'loading' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   30:21  warning  'setLoading' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   41:11  warning  'handleMenuOpen' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   46:11  warning  'handleMenuClose' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  120:31  warning  'verifyData' is assigned a value but never used       @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\admin\sections\UsersSection.tsx
+    4:59  warning  'Tooltip' is defined but never used      @typescript-eslint/no-unused-vars
+    6:48  warning  'Grid' is defined but never used         @typescript-eslint/no-unused-vars
+    6:54  warning  'FormControl' is defined but never used  @typescript-eslint/no-unused-vars
+    6:67  warning  'InputLabel' is defined but never used   @typescript-eslint/no-unused-vars
+    6:79  warning  'Select' is defined but never used       @typescript-eslint/no-unused-vars
+    9:19  warning  'Eye' is defined but never used          @typescript-eslint/no-unused-vars
+    9:24  warning  'Edit' is defined but never used         @typescript-eslint/no-unused-vars
+    9:43  warning  'Key' is defined but never used          @typescript-eslint/no-unused-vars
+  108:18  warning  'error' is defined but never used        @typescript-eslint/no-unused-vars
+  140:18  warning  'error' is defined but never used        @typescript-eslint/no-unused-vars
+  165:18  warning  'error' is defined but never used        @typescript-eslint/no-unused-vars
+  191:18  warning  'error' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\user\UserSidebar.tsx
+  3:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\user\sections\DashboardOverview.tsx
+   2:96  warning  'CircularProgress' is defined but never used  @typescript-eslint/no-unused-vars
+   3:44  warning  'AlertCircle' is defined but never used       @typescript-eslint/no-unused-vars
+  17:12  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\user\sections\ProfileSection.tsx
+  4:16  warning  'Mail' is defined but never used       @typescript-eslint/no-unused-vars
+  4:22  warning  'Phone' is defined but never used      @typescript-eslint/no-unused-vars
+  4:29  warning  'MapPin' is defined but never used     @typescript-eslint/no-unused-vars
+  4:43  warning  'Building2' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\user\sections\ProjectsSection.tsx
+  3:10  warning  'FolderKanban' is defined but never used  @typescript-eslint/no-unused-vars
+  3:24  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\components\user\sections\ServicesSection.tsx
+  2:15  warning  'Paper' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\sdevx\next\next\src\lib\auth.ts
+  27:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 74 problems (4 errors, 70 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+

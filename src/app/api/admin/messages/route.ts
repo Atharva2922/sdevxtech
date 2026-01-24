@@ -5,7 +5,7 @@ import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 // GET: Fetch all messages for admin (or specifically sent to null/admin)
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB();
 
@@ -31,10 +31,10 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ messages });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Admin Messages Fetch Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch messages', details: error.message },
+            { error: 'Failed to fetch messages', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
