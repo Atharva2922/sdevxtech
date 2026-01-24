@@ -191,7 +191,7 @@ export default function ProfileSection() {
             setToast({ open: true, message: 'Photo uploaded! Click Save to apply.', severity: 'success' });
         } catch (error: unknown) {
             console.error('Upload error:', error);
-            setToast({ open: true, message: error.message || 'Failed to upload photo', severity: 'error' });
+            setToast({ open: true, message: error instanceof Error ? error.message : 'Failed to upload photo', severity: 'error' });
         }
     };
 
