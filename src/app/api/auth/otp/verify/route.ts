@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
+import connectDB from '@/lib/db';
 import User from '@/models/User';
 import { verifyOTP, isOTPExpired } from '@/lib/otp';
 import { generateToken } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
     try {
@@ -71,7 +74,7 @@ export async function POST(req: NextRequest) {
         await user.save();
 
         // Generate JWT token
-        const token = generateToken({
+        const token = await generateToken({
             userId: user._id.toString(),
             email: user.email,
             role: user.role
