@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box } from '@mui/material';
+import { Box, IconButton, Drawer, useMediaQuery, useTheme } from '@mui/material';
+import { Menu as MenuIcon } from 'lucide-react';
 import UserSidebar from '@/components/user/UserSidebar';
 import DashboardOverview from '@/components/user/sections/DashboardOverview';
 import ProjectsSection from '@/components/user/sections/ProjectsSection';
@@ -13,8 +14,15 @@ import ProfileSection from '@/components/user/sections/ProfileSection';
 export default function UserDashboard() {
     const router = useRouter();
     const [currentSection, setCurrentSection] = useState('dashboard');
+    const [mobileOpen, setMobileOpen] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
 
     useEffect(() => {
         const loadUser = () => {
@@ -81,24 +89,68 @@ export default function UserDashboard() {
         }
     };
 
+    const sidebarContent = (
+        <UserSidebar
+            currentSection={currentSection}
+            setCurrentSection={(section) => {
+                setCurrentSection(section);
+                if (isMobile) setMobileOpen(false);
+            }}
+            userName={user.name}
+            userEmail={user.email}
+            userImage={user.image}
+        />
+    );
+
     return (
         <Box display="flex" minHeight="100vh" bgcolor="#f8fafc">
-            {/* Sidebar */}
-            <UserSidebar
-                currentSection={currentSection}
-                setCurrentSection={setCurrentSection}
-                userName={user.name}
-                userEmail={user.email}
-                userImage={user.image}
-            />
+            {/* Mobile Menu Button */}
+            {isMobile && (
+                <IconButton
+                    onClick={handleDrawerToggle}
+                    sx={{
+                        position: 'fixed',
+                        top: 16,
+                        left: 16,
+                        zIndex: 1300,
+                        bgcolor: 'white',
+                        boxShadow: 2,
+                        '&:hover': { bgcolor: 'white' }
+                    }}
+                >
+                    <MenuIcon size={24} />
+                </IconButton>
+            )}
+
+            {/* Desktop Sidebar */}
+            {!isMobile && sidebarContent}
+
+            {/* Mobile Drawer */}
+            {isMobile && (
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{
+                        '& .MuiDrawer-paper': {
+                            width: 280,
+                            boxSizing: 'border-box',
+                        },
+                    }}
+                >
+                    {sidebarContent}
+                </Drawer>
+            )}
 
             {/* Main Content */}
             <Box
                 component="main"
                 sx={{
                     flex: 1,
-                    ml: '280px',
-                    p: 4,
+                    ml: { xs: 0, md: '280px' },
+                    p: { xs: 2, sm: 3, md: 4 },
+                    pt: { xs: 10, md: 4 },
                     minHeight: '100vh',
                 }}
             >

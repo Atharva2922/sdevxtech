@@ -65,7 +65,7 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
             flexDirection: 'column',
             height: '100vh',
             backdropFilter: 'blur(10px)',
-            position: 'sticky',
+            position: { xs: 'relative', md: 'sticky' },
             top: 0,
             zIndex: 10
         }}>
