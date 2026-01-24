@@ -1,56 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Paper, Typography, Stack, Tabs, Tab, Chip, TextField, InputAdornment,
-    List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, IconButton
+    List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, CircularProgress,
+    Button
 } from '@mui/material';
 import {
-    Search, Filter, Info, AlertTriangle, AlertCircle, Clock, User, Server, Database
+    Search, Filter, Info, AlertTriangle, AlertCircle, Clock, User, Server, Database,
+    RefreshCcw, CheckCircle
 } from 'lucide-react';
 
-// Mock Data
-const ACTIVITY_LOGS = [
-    { id: 1, type: 'info', action: 'User Login', details: 'User "John Doe" logged in successfully', user: 'John Doe', time: '2 mins ago' },
-    { id: 2, type: 'warning', action: 'Failed Login Attempt', details: 'Multiple failed attempts from IP 192.168.1.1', user: 'Unknown', time: '15 mins ago' },
-    { id: 3, type: 'info', action: 'Content Update', details: 'Updated "Hero Section" content', user: 'Admin', time: '1 hour ago' },
-    { id: 4, type: 'error', action: 'Payment Failed', details: 'Transaction #TXN-78903 failed gateway validation', user: 'System', time: '3 hours ago' },
-    { id: 5, type: 'info', action: 'User Created', details: 'New user "Sarah Wilson" registered', user: 'System', time: '5 hours ago' },
-];
-
-const SYSTEM_LOGS = [
-    { id: 101, type: 'success', action: 'Backup Completed', details: 'Daily database backup finished successfully', source: 'Database', time: '02:00 AM' },
-    { id: 102, type: 'error', action: 'API Error', details: '500 Internal Server Error on /api/v1/content', source: 'API Server', time: 'Yesterday' },
-    { id: 103, type: 'warning', action: 'High Latency', details: 'Response time > 2s detected in region US-East', source: 'Monitoring', time: 'Yesterday' },
-    { id: 104, type: 'success', action: 'System Update', details: 'System patched to v2.1.0', source: 'DevOps', time: '2 days ago' },
-];
+interface Log {
+    _id: string;
+    action: string;
+    details: string;
+    type: 'info' | 'warning' | 'error' | 'success';
+    user: string;
+    source: string;
+    createdAt: string;
+}
 
 export default function LogsSection() {
-    const [tabValue, setTabValue] = useState(0);
+    const [tabValue, setTabValue] = useState(0); // 0: All, 1: Activity (User), 2: System
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
+    const [logs, setLogs] = useState<Log[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchLogs = async () => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (searchTerm) params.append('search', searchTerm);
+            if (filter !== 'all') params.append('type', filter);
+
+            const res = await fetch(`/api/logs?${params.toString()}`, {
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setLogs(data.logs || []);
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchLogs();
+        }, 500); // Debounce search
+        return () => clearTimeout(timer);
+    }, [searchTerm, filter]);
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
+        // Logic to filter by user vs system if needed, or just visual
     };
 
     const getIcon = (type: string) => {
         switch (type) {
             case 'error': return <AlertCircle size={20} color="#ef4444" />;
             case 'warning': return <AlertTriangle size={20} color="#f59e0b" />;
-            case 'success': return <Info size={20} color="#10b981" />; // Reusing Info for success/info generic
+            case 'success': return <CheckCircle size={20} color="#10b981" />;
             default: return <Info size={20} color="#3b82f6" />;
         }
     };
 
-    const logs = tabValue === 0 ? ACTIVITY_LOGS : SYSTEM_LOGS;
-
-    // Filter logic
-    const filteredLogs = logs.filter(log => {
-        const matchesSearch = log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.action.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filter === 'all' ||
-            (filter === 'error' && log.type === 'error') ||
-            (filter === 'warning' && log.type === 'warning');
-        return matchesSearch && matchesFilter;
+    // Filter logs based on tabs (client-side for now, or could be API param)
+    const displayLogs = logs.filter(log => {
+        if (tabValue === 0) return true;
+        // Simple heuristic: User actions vs System actions
+        const isSystem = log.user === 'System' || log.source === 'System' || log.source === 'Database';
+        if (tabValue === 1) return !isSystem; // Activity Logs
+        if (tabValue === 2) return isSystem;  // System Logs
+        return true;
     });
 
     return (
@@ -64,12 +90,19 @@ export default function LogsSection() {
                             onChange={handleTabChange}
                             sx={{ '& .MuiTab-root': { textTransform: 'none', minHeight: 48 } }}
                         >
+                            <Tab label="All Logs" />
                             <Tab label="Activity Logs" icon={<User size={16} />} iconPosition="start" />
                             <Tab label="System Logs" icon={<Server size={16} />} iconPosition="start" />
                         </Tabs>
                     </Box>
                     <Box display="flex" gap={2} alignItems="center">
                         <Stack direction="row" spacing={1}>
+                            <Button
+                                size="small"
+                                startIcon={<RefreshCcw size={14} />}
+                                onClick={fetchLogs}
+                                sx={{ minWidth: 'auto', px: 1 }}
+                            />
                             <Chip
                                 label="All"
                                 onClick={() => setFilter('all')}
@@ -82,13 +115,6 @@ export default function LogsSection() {
                                 onClick={() => setFilter('error')}
                                 color={filter === 'error' ? 'error' : 'default'}
                                 variant={filter === 'error' ? 'filled' : 'outlined'}
-                                size="small"
-                            />
-                            <Chip
-                                label="Warnings"
-                                onClick={() => setFilter('warning')}
-                                color={filter === 'warning' ? 'warning' : 'default'}
-                                variant={filter === 'warning' ? 'filled' : 'outlined'}
                                 size="small"
                             />
                         </Stack>
@@ -112,13 +138,17 @@ export default function LogsSection() {
 
             {/* Logs List */}
             <Paper elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', minHeight: 400 }}>
-                {filteredLogs.length > 0 ? (
+                {loading ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" height={400}>
+                        <CircularProgress />
+                    </Box>
+                ) : displayLogs.length > 0 ? (
                     <List sx={{ p: 0 }}>
-                        {filteredLogs.map((log, index) => (
-                            <Box key={log.id}>
+                        {displayLogs.map((log, index) => (
+                            <Box key={log._id}>
                                 <ListItem alignItems="flex-start" sx={{ p: 3, '&:hover': { bgcolor: '#f8fafc' } }}>
                                     <ListItemAvatar>
-                                        <Avatar sx={{ bgcolor: log.type === 'error' ? '#fef2f2' : log.type === 'warning' ? '#fffbeb' : '#eff6ff' }}>
+                                        <Avatar sx={{ bgcolor: log.type === 'error' ? '#fef2f2' : log.type === 'warning' ? '#fffbeb' : log.type === 'success' ? '#ecfdf5' : '#eff6ff' }}>
                                             {getIcon(log.type)}
                                         </Avatar>
                                     </ListItemAvatar>
@@ -129,7 +159,7 @@ export default function LogsSection() {
                                                     {log.action}
                                                 </Typography>
                                                 <Typography variant="caption" color="text.secondary" display="flex" alignItems="center" gap={0.5}>
-                                                    <Clock size={12} /> {log.time}
+                                                    <Clock size={12} /> {new Date(log.createdAt).toLocaleString()}
                                                 </Typography>
                                             </Box>
                                         }
@@ -140,15 +170,15 @@ export default function LogsSection() {
                                                 </Typography>
                                                 <Stack direction="row" spacing={1}>
                                                     <Chip
-                                                        label={(log as any).user || (log as any).source}
+                                                        label={log.user || log.source}
                                                         size="small"
                                                         sx={{ borderRadius: '4px', height: 20, fontSize: '10px' }}
-                                                        icon={tabValue === 0 ? <User size={10} /> : <Database size={10} />}
+                                                        icon={tabValue === 1 ? <User size={10} /> : <Database size={10} />}
                                                     />
                                                     <Chip
                                                         label={log.type.toUpperCase()}
                                                         size="small"
-                                                        color={log.type === 'error' ? 'error' : log.type === 'warning' ? 'warning' : 'primary'}
+                                                        color={log.type === 'error' ? 'error' : log.type === 'warning' ? 'warning' : log.type === 'success' ? 'success' : 'primary'}
                                                         variant="outlined"
                                                         sx={{ borderRadius: '4px', height: 20, fontSize: '10px' }}
                                                     />
@@ -157,7 +187,7 @@ export default function LogsSection() {
                                         }
                                     />
                                 </ListItem>
-                                {index < filteredLogs.length - 1 && <Divider variant="inset" component="li" />}
+                                {index < displayLogs.length - 1 && <Divider variant="inset" component="li" />}
                             </Box>
                         ))}
                     </List>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Stack, Grid, Card, CardContent, Button, Chip, CircularProgress, Alert } from '@mui/material';
+import { Box, Paper, Typography, Stack, Grid, Card, CardContent, Button, Chip, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
 import { Code, Palette, Search, Smartphone, TrendingUp, Shield } from 'lucide-react';
 
 interface Service {
@@ -17,6 +17,15 @@ export default function ServicesSection() {
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    // Request Dialog State
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [requestDetails, setRequestDetails] = useState('');
+    const [requestLoading, setRequestLoading] = useState(false);
+
+    // Toast
+    const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
         fetchServices();
@@ -37,6 +46,47 @@ export default function ServicesSection() {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleOpenRequest = (service: Service) => {
+        setSelectedService(service);
+        setOpenDialog(true);
+    };
+
+    const handleSubmitRequest = async () => {
+        if (!selectedService) return;
+        if (!requestDetails.trim()) {
+            setToast({ open: true, message: 'Please provide some details about your needs', severity: 'error' });
+            return;
+        }
+
+        setRequestLoading(true);
+        try {
+            const res = await fetch('/api/user/services/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    serviceId: selectedService._id,
+                    serviceName: selectedService.name,
+                    details: requestDetails
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+
+            setToast({ open: true, message: 'Service requested successfully! We will contact you soon.', severity: 'success' });
+            setOpenDialog(false);
+            setRequestDetails('');
+            setSelectedService(null);
+        } catch (err: any) {
+            setToast({ open: true, message: err.message, severity: 'error' });
+        } finally {
+            setRequestLoading(false);
         }
     };
 
@@ -73,7 +123,7 @@ export default function ServicesSection() {
                     {services.map((service, index) => {
                         const Icon = getIcon(service.icon);
                         return (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{
@@ -118,6 +168,7 @@ export default function ServicesSection() {
                                         <Button
                                             fullWidth
                                             variant="outlined"
+                                            onClick={() => handleOpenRequest(service)}
                                             sx={{
                                                 borderRadius: '12px',
                                                 textTransform: 'none',
@@ -138,6 +189,71 @@ export default function ServicesSection() {
                     })}
                 </Grid>
             )}
+
+            {/* Service Request Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                PaperProps={{
+                    sx: { borderRadius: '16px', maxWidth: 500, width: '100%' }
+                }}
+            >
+                <DialogTitle fontWeight="bold">
+                    Request {selectedService?.name}
+                </DialogTitle>
+                <DialogContent>
+                    <Stack spacing={2} mt={1}>
+                        <Typography variant="body2" color="text.secondary">
+                            Tell us a bit about your requirements. Our team will get back to you shortly.
+                        </Typography>
+                        <TextField
+                            label="Requirements / Details"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={requestDetails}
+                            onChange={(e) => setRequestDetails(e.target.value)}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={() => setOpenDialog(false)}
+                        sx={{ textTransform: 'none', borderRadius: '8px' }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmitRequest}
+                        disabled={requestLoading}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                        }}
+                    >
+                        {requestLoading ? 'Submitting...' : 'Send Request'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Toast Notification */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={4000}
+                onClose={() => setToast({ ...toast, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setToast({ ...toast, open: false })}
+                    severity={toast.severity}
+                    sx={{ borderRadius: '12px' }}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Stack>
     );
 }

@@ -1,19 +1,60 @@
-import { Box, Paper, Typography, Grid, Card, CardContent, LinearProgress, Chip, Stack, Button } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Paper, Typography, Grid, Card, CardContent, LinearProgress, Chip, Stack, Button, CircularProgress } from '@mui/material';
 import { FolderKanban, Clock, CheckCircle, AlertCircle, TrendingUp, MessageSquare } from 'lucide-react';
 
 export default function DashboardOverview() {
-    const stats = [
-        { label: 'Active Projects', value: '3', icon: FolderKanban, color: '#667eea', change: '+2 this month' },
-        { label: 'Pending Tasks', value: '7', icon: Clock, color: '#f59e0b', change: '3 due soon' },
-        { label: 'Completed', value: '12', icon: CheckCircle, color: '#10b981', change: '+5 this month' },
-        { label: 'Messages', value: '4', icon: MessageSquare, color: '#3b82f6', change: '2 unread' },
-    ];
+    const [stats, setStats] = useState<any[]>([
+        { label: 'Active Projects', value: '-', icon: FolderKanban, color: '#667eea', change: 'Loading...' },
+        { label: 'Pending Tasks', value: '-', icon: Clock, color: '#f59e0b', change: 'Loading...' },
+        { label: 'Completed', value: '-', icon: CheckCircle, color: '#10b981', change: 'Loading...' },
+        { label: 'Messages', value: '-', icon: MessageSquare, color: '#3b82f6', change: 'Loading...' },
+    ]);
+    const [loading, setLoading] = useState(true);
 
-    const recentProjects = [
-        { name: 'E-commerce Website', status: 'In Progress', progress: 65, dueDate: 'Feb 15, 2026' },
-        { name: 'Mobile App Design', status: 'Review', progress: 90, dueDate: 'Feb 10, 2026' },
-        { name: 'SEO Optimization', status: 'Planning', progress: 25, dueDate: 'Mar 1, 2026' },
-    ];
+    const [recentProjects, setRecentProjects] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch Stats
+                const statsRes = await fetch('/api/user/stats');
+                if (statsRes.ok) {
+                    const data = await statsRes.json();
+                    if (data.stats) {
+                        const enhancedStats = data.stats.map((s: any) => ({
+                            ...s,
+                            icon: getIcon(s.label)
+                        }));
+                        setStats(enhancedStats);
+                    }
+                }
+
+                // Fetch Recent Projects
+                const projectsRes = await fetch('/api/user/projects');
+                if (projectsRes.ok) {
+                    const data = await projectsRes.json();
+                    if (data.projects) {
+                        setRecentProjects(data.projects.slice(0, 3));
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getIcon = (label: string) => {
+        switch (label) {
+            case 'Active Projects': return FolderKanban;
+            case 'Pending Tasks': return Clock;
+            case 'Completed': return CheckCircle;
+            default: return MessageSquare;
+        }
+    };
 
     return (
         <Stack spacing={3}>
@@ -32,7 +73,7 @@ export default function DashboardOverview() {
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                             <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '16px' }}>
                                 <CardContent>
                                     <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -132,7 +173,7 @@ export default function DashboardOverview() {
                     Quick Actions
                 </Typography>
                 <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Button
                             fullWidth
                             variant="outlined"
@@ -146,7 +187,7 @@ export default function DashboardOverview() {
                             Request Service
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Button
                             fullWidth
                             variant="outlined"
@@ -160,7 +201,7 @@ export default function DashboardOverview() {
                             Upload Files
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Button
                             fullWidth
                             variant="outlined"
@@ -174,7 +215,7 @@ export default function DashboardOverview() {
                             Send Message
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Button
                             fullWidth
                             variant="outlined"

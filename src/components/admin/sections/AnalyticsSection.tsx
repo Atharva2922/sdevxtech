@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Box, Paper, Typography, Stack, Grid, Card, CardContent, Button, Divider, LinearProgress
+    Box, Paper, Typography, Stack, Grid, Card, CardContent, Button, Divider, LinearProgress, CircularProgress
 } from '@mui/material';
 import {
     Download, FileText, FileSpreadsheet, TrendingUp, Users, Activity, ExternalLink
@@ -8,6 +8,26 @@ import {
 
 export default function AnalyticsSection() {
     const [exporting, setExporting] = useState(false);
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    const fetchAnalytics = async () => {
+        try {
+            const res = await fetch('/api/analytics', { credentials: 'include' });
+            if (res.ok) {
+                const fetchedData = await res.json();
+                setData(fetchedData);
+            }
+        } catch (error) {
+            console.error('Error fetching analytics:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAnalytics();
+    }, []);
 
     const handleExport = (type: string) => {
         setExporting(true);
@@ -17,6 +37,22 @@ export default function AnalyticsSection() {
             setExporting(false);
         }, 1000);
     };
+
+    // calculate total feature usage from project breakdown (example mapping)
+    const getProjectBreakdown = () => {
+        if (!data?.projects?.breakdown) return [];
+        const total = data.projects.total || 1;
+        return data.projects.breakdown.map((b: any) => ({
+            label: b._id,
+            value: Math.round((b.count / total) * 100),
+            count: b.count,
+            color: b._id === 'Completed' ? '#10b981' : b._id === 'In Progress' ? '#3b82f6' : '#f59e0b'
+        }));
+    };
+
+    if (loading) return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;
+
+    const projectStats = getProjectBreakdown();
 
     return (
         <Stack spacing={4}>
@@ -65,33 +101,36 @@ export default function AnalyticsSection() {
                             <Box display="flex" gap={2}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Box width={8} height={8} borderRadius="50%" bgcolor="#3b82f6" />
-                                    <Typography variant="caption">New Users</Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                    <Box width={8} height={8} borderRadius="50%" bgcolor="#e2e8f0" />
-                                    <Typography variant="caption">Active Users</Typography>
+                                    <Typography variant="caption">New Users ({data?.users?.total || 0})</Typography>
                                 </Box>
                             </Box>
                         </Box>
 
-                        {/* Custom CSS Chart Placeholder */}
+                        {/* Custom CSS Chart Placeholder - using real growth data if available, else placeholder */}
                         <Box height={300} display="flex" alignItems="flex-end" justifyContent="space-between" gap={1} sx={{ opacity: 0.9 }}>
-                            {[40, 65, 50, 80, 70, 90, 85, 100, 95, 110, 105, 130].map((h, i) => (
-                                <Box key={i} width="100%" display="flex" flexDirection="column" gap={0.5}>
-                                    <Box
-                                        sx={{
-                                            height: `${h * 1.5}px`,
-                                            bgcolor: i === 11 ? '#3b82f6' : '#bfdbfe',
-                                            borderRadius: '4px',
-                                            transition: 'height 1s',
-                                            '&:hover': { bgcolor: '#2563eb' }
-                                        }}
-                                    />
-                                    <Typography variant="caption" align="center" color="text.secondary">
-                                        {['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'][i]}
-                                    </Typography>
-                                </Box>
-                            ))}
+                            {/* Map growth data or fallback to 0. Ideally verify buckets match month names. */}
+                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
+                                // Find bucket for this month (simplified logic)
+                                const count = data?.users?.growth?.find((g: any) => g._id === i + 1)?.count || 0;
+                                // Scale height: assume max 10 users for visual scaling for now
+                                const height = Math.min((count / 10) * 200 + 20, 250);
+                                return (
+                                    <Box key={i} width="100%" display="flex" flexDirection="column" gap={0.5}>
+                                        <Box
+                                            sx={{
+                                                height: `${height}px`,
+                                                bgcolor: i === 5 ? '#3b82f6' : '#bfdbfe',
+                                                borderRadius: '4px',
+                                                transition: 'height 1s',
+                                                '&:hover': { bgcolor: '#2563eb' }
+                                            }}
+                                        />
+                                        <Typography variant="caption" align="center" color="text.secondary">
+                                            {month}
+                                        </Typography>
+                                    </Box>
+                                )
+                            })}
                         </Box>
                     </Paper>
                 </Box>
@@ -103,20 +142,15 @@ export default function AnalyticsSection() {
                             <Box p={1} bgcolor="#ecfdf5" borderRadius="8px">
                                 <Activity size={20} color="#10b981" />
                             </Box>
-                            <Typography variant="subtitle1" fontWeight={600}>Most Used Features</Typography>
+                            <Typography variant="subtitle1" fontWeight={600}>Project Status</Typography>
                         </Box>
 
                         <Stack spacing={4}>
-                            {[
-                                { label: 'Content Editor', value: 85, color: '#10b981' },
-                                { label: 'User Management', value: 60, color: '#f59e0b' },
-                                { label: 'Transactions', value: 45, color: '#6366f1' },
-                                { label: 'Settings', value: 20, color: '#64748b' },
-                            ].map((item, i) => (
+                            {projectStats.length > 0 ? projectStats.map((item: any, i: number) => (
                                 <Box key={i}>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body2" fontWeight={500}>{item.label}</Typography>
-                                        <Typography variant="body2" fontWeight={600}>{item.value}%</Typography>
+                                        <Typography variant="body2" fontWeight={600}>{item.count} ({item.value}%)</Typography>
                                     </Box>
                                     <LinearProgress
                                         variant="determinate"
@@ -129,7 +163,9 @@ export default function AnalyticsSection() {
                                         }}
                                     />
                                 </Box>
-                            ))}
+                            )) : (
+                                <Typography color="text.secondary">No project data available</Typography>
+                            )}
                         </Stack>
                     </Paper>
                 </Box>
@@ -150,12 +186,7 @@ export default function AnalyticsSection() {
                         </Box>
 
                         <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }} gap={2}>
-                            {[
-                                { name: 'John Doe', role: 'Premium', visits: '1.2k', p: 95 },
-                                { name: 'Sarah Wilson', role: 'Business', visits: '940', p: 82 },
-                                { name: 'Mike Ross', role: 'Basic', visits: '850', p: 70 },
-                                { name: 'Rachel Z', role: 'Premium', visits: '720', p: 55 },
-                            ].map((user, i) => (
+                            {data?.logs?.activeUsers?.map((user: any, i: number) => (
                                 <Card key={i} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px' }}>
                                     <CardContent sx={{ p: '16px !important' }}>
                                         <Box display="flex" alignItems="center" gap={2}>
@@ -171,12 +202,18 @@ export default function AnalyticsSection() {
                                             </Box>
                                             <Box>
                                                 <Typography variant="body2" fontWeight={600}>{user.name}</Typography>
-                                                <Typography variant="caption" color="text.secondary">{user.role} • {user.visits} visits</Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {user.visits} visits<br />
+                                                    Last: {new Date(user.lastActive).toLocaleDateString()}
+                                                </Typography>
                                             </Box>
                                         </Box>
                                     </CardContent>
                                 </Card>
                             ))}
+                            {(!data?.logs?.activeUsers || data.logs.activeUsers.length === 0) && (
+                                <Typography color="text.secondary">No active users found recently.</Typography>
+                            )}
                         </Box>
                     </Paper>
                 </Box>

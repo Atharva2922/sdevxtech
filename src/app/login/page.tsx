@@ -68,7 +68,7 @@ export default function LoginPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: '#f8fafc',
                 p: 2
             }}
         >
@@ -79,8 +79,7 @@ export default function LoginPage() {
                     width: '100%',
                     p: 4,
                     borderRadius: '24px',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)'
+                    background: '#ffffff',
                 }}
             >
                 <Stack spacing={3}>

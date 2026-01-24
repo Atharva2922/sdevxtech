@@ -30,7 +30,7 @@
     "subtext": "Beautiful, functional, and responsive websites tailored to your unique needs.",
     "primaryButton": {
       "label": "Start Your Project",
-      "href": "#contact"
+      "href": "/login"
     },
     "secondaryButton": {
       "label": "Explore Services",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Stack, Chip, Button, LinearProgress, Grid, CircularProgress, Alert } from '@mui/material';
-import { FolderKanban, Clock, Download, Eye } from 'lucide-react';
+import { Box, Paper, Typography, Stack, Chip, Button, LinearProgress, Grid, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { FolderKanban, Clock, Download, Eye, Plus } from 'lucide-react';
 
 interface Project {
     _id: string;
@@ -19,6 +19,16 @@ export default function ProjectsSection() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+    // Dialog State
+    const [openDialog, setOpenDialog] = useState(false);
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        dueDate: '',
+        type: ''
+    });
+
     useEffect(() => {
         fetchProjects();
     }, []);
@@ -26,7 +36,7 @@ export default function ProjectsSection() {
     const fetchProjects = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/projects', {
+            const response = await fetch('/api/user/projects', {
                 credentials: 'include'
             });
 
@@ -40,6 +50,36 @@ export default function ProjectsSection() {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleRequestProject = async () => {
+        if (!formData.name || !formData.description || !formData.dueDate) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        setRequestLoading(true);
+        try {
+            const res = await fetch('/api/user/projects/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to request project');
+            }
+
+            // Refresh projects
+            await fetchProjects();
+            setOpenDialog(false);
+            setFormData({ name: '', description: '', dueDate: '', type: '' });
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setRequestLoading(false);
         }
     };
 
@@ -66,6 +106,8 @@ export default function ProjectsSection() {
                 </Box>
                 <Button
                     variant="contained"
+                    startIcon={<Plus size={18} />}
+                    onClick={() => setOpenDialog(true)}
                     sx={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         textTransform: 'none',
@@ -99,7 +141,7 @@ export default function ProjectsSection() {
             {!loading && !error && projects.length > 0 && (
                 <Grid container spacing={3}>
                     {projects.map((project) => (
-                        <Grid item xs={12} key={project._id}>
+                        <Grid size={{ xs: 12 }} key={project._id}>
                             <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                                 <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
                                     <Box flex={1}>
@@ -119,7 +161,7 @@ export default function ProjectsSection() {
                                         </Typography>
 
                                         <Grid container spacing={2} mb={2}>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                 <Typography variant="caption" color="text.secondary">
                                                     Team
                                                 </Typography>
@@ -127,23 +169,23 @@ export default function ProjectsSection() {
                                                     {project.team}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                 <Typography variant="caption" color="text.secondary">
                                                     Start Date
                                                 </Typography>
                                                 <Typography variant="body2" fontWeight={500}>
-                                                    {project.startDate}
+                                                    {new Date(project.startDate).toLocaleDateString()}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                 <Typography variant="caption" color="text.secondary">
                                                     Due Date
                                                 </Typography>
                                                 <Typography variant="body2" fontWeight={500}>
-                                                    {project.dueDate}
+                                                    {new Date(project.dueDate).toLocaleDateString()}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                 <Typography variant="caption" color="text.secondary">
                                                     Deliverables
                                                 </Typography>
@@ -214,6 +256,74 @@ export default function ProjectsSection() {
                     ))}
                 </Grid>
             )}
+
+            {/* Application Request Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                PaperProps={{
+                    sx: { borderRadius: '16px', maxWidth: 500, width: '100%' }
+                }}
+            >
+                <DialogTitle fontWeight="bold">Request New Project</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={2} mt={1}>
+                        <TextField
+                            label="Project Name"
+                            fullWidth
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                        <TextField
+                            label="Description"
+                            fullWidth
+                            multiline
+                            rows={3}
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                        <TextField
+                            label="Project Type"
+                            fullWidth
+                            placeholder="e.g. Web Development, Mobile App"
+                            value={formData.type}
+                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                        <TextField
+                            label="Target Due Date"
+                            type="date"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                            value={formData.dueDate}
+                            onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={() => setOpenDialog(false)}
+                        sx={{ textTransform: 'none', borderRadius: '8px' }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleRequestProject}
+                        disabled={requestLoading}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                        }}
+                    >
+                        {requestLoading ? 'Submitting...' : 'Submit Request'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     );
 }

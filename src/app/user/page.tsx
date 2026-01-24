@@ -60,7 +60,7 @@ export default function UserDashboard() {
     const renderSection = () => {
         switch (currentSection) {
             case 'dashboard':
-                return <DashboardOverview />;
+                return <DashboardOverview onNavigate={setCurrentSection} />;
             case 'projects':
                 return <ProjectsSection />;
             case 'services':

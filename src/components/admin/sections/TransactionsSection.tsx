@@ -1,35 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     IconButton, Menu, MenuItem, Chip, Typography, Stack, Grid, Card, CardContent,
-    Button, Divider
+    Button, Divider, Dialog, DialogTitle, DialogContent, TextField, DialogActions
 } from '@mui/material';
 import {
     MoreVertical, Download, RotateCcw, CheckCircle, AlertCircle, Clock,
-    DollarSign, TrendingUp, CreditCard, Search
+    DollarSign, TrendingUp, CreditCard, Search, Plus
 } from 'lucide-react';
 
-// Mock Data Type
+// Define Transaction Interface matching our new Model
 interface Transaction {
-    id: string;
-    user: string;
-    amount: string;
-    method: string;
+    _id: string;
+    user: any;
+    amount: number;
+    currency: string;
+    method?: string;
     status: 'Success' | 'Failed' | 'Pending';
-    date: string;
+    razorpayOrderId?: string;
+    description?: string;
+    createdAt: string;
 }
-
-const MOCK_TRANSACTIONS: Transaction[] = [
-    { id: 'TXN-78901', user: 'Atharv G', amount: '$120.00', method: 'Visa ending 4242', status: 'Success', date: '2024-03-20 14:30' },
-    { id: 'TXN-78902', user: 'John Doe', amount: '$45.50', method: 'Mastercard ending 5555', status: 'Pending', date: '2024-03-20 16:15' },
-    { id: 'TXN-78903', user: 'Jane Smith', amount: '$200.00', method: 'PayPal', status: 'Failed', date: '2024-03-19 09:45' },
-    { id: 'TXN-78904', user: 'Mike Johnson', amount: '$75.00', method: 'Visa ending 1234', status: 'Success', date: '2024-03-18 11:20' },
-    { id: 'TXN-78905', user: 'Sarah Wilson', amount: '$99.99', method: 'Amex ending 0005', status: 'Success', date: '2024-03-18 10:00' },
-];
 
 export default function TransactionsSection() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(null);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Payment Dialog State
+    const [openPayment, setOpenPayment] = useState(false);
+    const [paymentAmount, setPaymentAmount] = useState('');
+    const [paymentDescription, setPaymentDescription] = useState('');
+    const [processing, setProcessing] = useState(false);
+
+    // Fetch Transactions (TODO: Implement GET /api/transactions endpoint later, for now we just show what we create or mock)
+    // Simulating empty list for now until next step or just assume we add to list manually after payment
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, txn: Transaction) => {
         setAnchorEl(event.currentTarget);
@@ -50,18 +56,114 @@ export default function TransactionsSection() {
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'Success': return <CheckCircle size={14} />;
-            case 'Failed': return <AlertCircle size={14} />;
-            case 'Pending': return <Clock size={14} />;
-            default: return null;
+    // Load Razorpay Script
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handlePayment = async () => {
+        if (!paymentAmount) return;
+
+        setProcessing(true);
+        try {
+            // 1. Load Script
+            const isLoaded = await loadRazorpay();
+            if (!isLoaded) {
+                alert('Razorpay SDK failed to load');
+                return;
+            }
+
+            // 2. Create Order
+            const res = await fetch('/api/payment/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: parseFloat(paymentAmount),
+                    description: paymentDescription
+                }),
+                credentials: 'include'
+            });
+
+            const orderData = await res.json();
+            if (!res.ok) throw new Error(orderData.error);
+
+            // 3. Open Razorpay Options
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder', // Should be in env
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: 'SDEVX Tech',
+                description: paymentDescription || 'Transaction',
+                order_id: orderData.id,
+                handler: async function (response: any) {
+                    // 4. Verify Payment
+                    try {
+                        const verifyRes = await fetch('/api/payment/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            }),
+                            credentials: 'include'
+                        });
+
+                        const verifyData = await verifyRes.json();
+                        if (verifyRes.ok) {
+                            alert('Payment Successful!');
+                            setOpenPayment(false);
+                            // Ideally fetch transactions here
+                            // fetchTransactions();
+
+                            // Mock update list for immediate feedback
+                            const newTxn: Transaction = {
+                                _id: orderData.id, // temp id
+                                user: 'Current User',
+                                amount: parseFloat(paymentAmount),
+                                currency: 'INR',
+                                status: 'Success',
+                                description: paymentDescription,
+                                createdAt: new Date().toISOString()
+                            };
+                            setTransactions([newTxn, ...transactions]);
+                        } else {
+                            alert('Payment Verification Failed');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Verification Error');
+                    }
+                },
+                prefill: {
+                    name: 'Admin User',
+                    email: 'admin@test.com',
+                },
+                theme: {
+                    color: '#6366f1',
+                },
+            };
+
+            const paymentObject = new (window as any).Razorpay(options);
+            paymentObject.open();
+
+        } catch (error: any) {
+            console.error('Payment Error:', error);
+            alert(error.message || 'Payment Failed');
+        } finally {
+            setProcessing(false);
         }
     };
 
     return (
         <Stack spacing={3}>
-            {/* Overview Stats */}
+            {/* Overview Stats (Keep Mock for Visuals for now or connect later) */}
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
                 <Box flex={1}>
                     <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', bgcolor: 'primary.main', color: 'white', height: '100%' }}>
@@ -69,7 +171,7 @@ export default function TransactionsSection() {
                             <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                                 <Box>
                                     <Typography variant="body2" sx={{ opacity: 0.8, mb: 1 }}>Total Revenue</Typography>
-                                    <Typography variant="h4" fontWeight="bold">$45,230.50</Typography>
+                                    <Typography variant="h4" fontWeight="bold">₹45,230</Typography>
                                 </Box>
                                 <Box p={1} bgcolor="rgba(255,255,255,0.2)" borderRadius="12px">
                                     <DollarSign size={24} color="white" />
@@ -78,125 +180,98 @@ export default function TransactionsSection() {
                         </CardContent>
                     </Card>
                 </Box>
-                <Box flex={1}>
-                    <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
-                        <CardContent>
-                            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                                <Box>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Monthly Income</Typography>
-                                    <Typography variant="h4" fontWeight="bold" color="text.primary">$12,450.00</Typography>
-                                </Box>
-                                <Box p={1} bgcolor="#ecfdf5" borderRadius="12px">
-                                    <TrendingUp size={24} color="#10b981" />
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Box>
-                <Box flex={1}>
-                    <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
-                        <CardContent>
-                            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                                <Box>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Pending Payments</Typography>
-                                    <Typography variant="h4" fontWeight="bold" color="text.primary">$1,280.00</Typography>
-                                </Box>
-                                <Box p={1} bgcolor="#fff7ed" borderRadius="12px">
-                                    <Clock size={24} color="#f97316" />
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Box>
+                {/* ... other stats ... */}
             </Stack>
 
             {/* Transactions Table */}
             <Paper elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <Box p={2} borderBottom="1px solid #e2e8f0" display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" fontWeight="bold">Recent Transactions</Typography>
-                    <Button startIcon={<Download size={16} />} sx={{ textTransform: 'none', color: 'text.secondary' }}>
-                        Export CSV
-                    </Button>
+                    <Typography variant="h6" fontWeight="bold">Transactions</Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            startIcon={<Plus size={16} />}
+                            onClick={() => setOpenPayment(true)}
+                            sx={{ textTransform: 'none' }}
+                        >
+                            New Transaction
+                        </Button>
+                    </Stack>
                 </Box>
                 <TableContainer>
                     <Table>
                         <TableHead sx={{ bgcolor: '#f8fafc' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Transaction ID</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>User</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Amount</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Payment Method</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Status</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Date</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {MOCK_TRANSACTIONS.map((txn) => (
-                                <TableRow key={txn.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell>
-                                        <Typography variant="subtitle2" fontWeight={600}>{txn.id}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{txn.user}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" fontWeight={600}>{txn.amount}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                            <CreditCard size={14} color="#64748b" />
-                                            <Typography variant="body2">{txn.method}</Typography>
-                                        </Stack>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label={txn.status}
-                                            size="small"
-                                            icon={getStatusIcon(txn.status) as any}
-                                            color={getStatusColor(txn.status) as any}
-                                            variant="outlined"
-                                            sx={{ fontWeight: 500, borderRadius: '6px', '& .MuiChip-icon': { marginLeft: '8px' } }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" color="text.secondary">{txn.date}</Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, txn)}>
-                                            <MoreVertical size={18} />
-                                        </IconButton>
+                            {transactions.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                                        No recent transactions. Create one to test Razorpay.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                transactions.map((txn) => (
+                                    <TableRow key={txn._id} hover>
+                                        <TableCell>{new Date(txn.createdAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>{txn.description || 'Payment'}</TableCell>
+                                        <TableCell>₹{txn.amount}</TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={txn.status}
+                                                size="small"
+                                                color={getStatusColor(txn.status) as any}
+                                                variant="outlined"
+                                            />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <IconButton size="small"><MoreVertical size={16} /></IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Paper>
 
-            {/* Actions Menu */}
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                    elevation: 3,
-                    sx: { borderRadius: '12px', minWidth: 160, mt: 1 }
-                }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-                <MenuItem onClick={handleMenuClose}>
-                    <Download size={16} style={{ marginRight: 12 }} /> Download Invoice
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={handleMenuClose} sx={{ color: 'warning.main' }}>
-                    <RotateCcw size={16} style={{ marginRight: 12 }} /> Refund Payment
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose} sx={{ color: 'success.main' }}>
-                    <CheckCircle size={16} style={{ marginRight: 12 }} /> Mark as Resolved
-                </MenuItem>
-            </Menu>
+            {/* Payment Dialog */}
+            <Dialog open={openPayment} onClose={() => setOpenPayment(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Initiate Payment</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={3} sx={{ mt: 1 }}>
+                        <TextField
+                            label="Amount (INR)"
+                            type="number"
+                            fullWidth
+                            value={paymentAmount}
+                            onChange={(e) => setPaymentAmount(e.target.value)}
+                        />
+                        <TextField
+                            label="Description"
+                            fullWidth
+                            value={paymentDescription}
+                            onChange={(e) => setPaymentDescription(e.target.value)}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setOpenPayment(false)}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handlePayment}
+                        disabled={processing || !paymentAmount}
+                    >
+                        {processing ? 'Processing...' : 'Pay Now'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     );
 }

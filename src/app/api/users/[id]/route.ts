@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import Project from '@/models/Project';
+import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-// PUT: Update project
+// PUT: Update user (Admin only)
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     try {
@@ -18,37 +18,36 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         }
 
         const payload = await verifyToken(token);
-        if (!payload) {
-            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        if (!payload || payload.role !== 'admin') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const body = await req.json();
         const { id } = params;
 
-        const project = await Project.findById(id);
-        if (!project) {
-            return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+        // Prevent admin from blocking themselves (optional safety check)
+        if (id === payload.userId && body.status === 'Blocked') {
+            return NextResponse.json({ error: 'Cannot block your own admin account' }, { status: 400 });
         }
 
-        // Only Admin or the project owner can update
-        if (payload.role !== 'admin' && project.userId.toString() !== payload.userId) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-
-        const updatedProject = await Project.findByIdAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
             id,
             { ...body },
             { new: true, runValidators: true }
-        );
+        ).select('-password');
 
-        return NextResponse.json({ project: updatedProject });
+        if (!updatedUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ user: updatedUser });
     } catch (error: any) {
-        console.error('Error updating project:', error);
+        console.error('Error updating user:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
 
-// DELETE: Delete project
+// DELETE: Delete user (Admin only)
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     try {
@@ -62,22 +61,25 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
         }
 
         const payload = await verifyToken(token);
-        // Only Admin can delete projects usually, or maybe owner too? 
-        // Let's restrict DELETE to Admin only for safety in Admin Panel context
         if (!payload || payload.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const { id } = params;
-        const deletedProject = await Project.findByIdAndDelete(id);
 
-        if (!deletedProject) {
-            return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+        if (id === payload.userId) {
+            return NextResponse.json({ error: 'Cannot delete your own admin account' }, { status: 400 });
         }
 
-        return NextResponse.json({ message: 'Project deleted successfully' });
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: 'User deleted successfully' });
     } catch (error: any) {
-        console.error('Error deleting project:', error);
+        console.error('Error deleting user:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }

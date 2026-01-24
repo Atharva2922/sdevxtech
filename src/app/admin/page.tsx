@@ -97,6 +97,7 @@ export default function AdminPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
+                credentials: 'include'
             });
             if (res.ok) {
                 setToast({ open: true, message: 'Changes saved successfully!', severity: 'success' });
@@ -229,7 +230,7 @@ export default function AdminPage() {
     // Logout Handler
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
             localStorage.removeItem('auth-token');
             localStorage.removeItem('user');
             router.push('/login');

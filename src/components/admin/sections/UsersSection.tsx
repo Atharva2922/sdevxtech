@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import {
     Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     IconButton, Menu, MenuItem, Chip, Avatar, Typography, Tooltip, Stack,
-    TextField, InputAdornment, Button, Divider, CircularProgress
+    TextField, InputAdornment, Button, Divider, CircularProgress, Dialog,
+    DialogTitle, DialogContent, DialogActions, Grid, FormControl, InputLabel, Select, Snackbar, Alert
 } from '@mui/material';
 import {
-    MoreVertical, Eye, Edit, Ban, Trash2, Key, Shield, Search, Filter, Plus
+    MoreVertical, Eye, Edit, Ban, Trash2, Key, Shield, Search, Filter, Plus, CheckCircle
 } from 'lucide-react';
 
 interface User {
@@ -27,25 +28,45 @@ export default function UsersSection() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch('/api/users', {
-                    credentials: 'include'
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUsers(data.users || []);
+    // Action States
+    const [openAddDialog, setOpenAddDialog] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+    // New User Form State
+    const [newUser, setNewUser] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'user',
+        phone: ''
+    });
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('/api/users', {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data.users || []);
+            } else {
+                if (response.status === 403) {
+                    setToast({ open: true, message: 'Access Denied: You need admin privileges to view users.', severity: 'error' });
                 } else {
                     console.error('Failed to fetch users', await response.text());
+                    setToast({ open: true, message: 'Failed to fetch users', severity: 'error' });
                 }
-            } catch (error) {
-                console.error('Error loading users:', error);
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (error) {
+            console.error('Error loading users:', error);
+            setToast({ open: true, message: 'Error loading users list', severity: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchUsers();
     }, []);
 
@@ -59,12 +80,125 @@ export default function UsersSection() {
         setSelectedUser(null);
     };
 
+    // API Actions
+    const handleAddUser = async () => {
+        if (!newUser.name || !newUser.email || !newUser.password) {
+            setToast({ open: true, message: 'Please fill in all required fields', severity: 'error' });
+            return;
+        }
+
+        setActionLoading(true);
+        try {
+            const res = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newUser),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                setToast({ open: true, message: 'User created successfully', severity: 'success' });
+                setOpenAddDialog(false);
+                setNewUser({ name: '', email: '', password: '', role: 'user', phone: '' });
+                fetchUsers();
+            } else {
+                const error = await res.json();
+                setToast({ open: true, message: error.error || 'Failed to create user', severity: 'error' });
+            }
+        } catch (error) {
+            setToast({ open: true, message: 'Error creating user', severity: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleUpdateUserStatus = async (status: string) => {
+        if (!selectedUser) return;
+        handleMenuClose();
+
+        // Optimistic update
+        const updatedUsers = users.map(u =>
+            u._id === selectedUser._id ? { ...u, status } : u
+        );
+        setUsers(updatedUsers);
+
+        try {
+            const res = await fetch(`/api/users/${selectedUser._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status }),
+                credentials: 'include'
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                setToast({ open: true, message: error.error || 'Failed to update status', severity: 'error' });
+                fetchUsers(); // Revert
+            } else {
+                setToast({ open: true, message: `User ${status === 'Blocked' ? 'blocked' : 'activated'}`, severity: 'success' });
+            }
+        } catch (error) {
+            setToast({ open: true, message: 'Error updating user', severity: 'error' });
+            fetchUsers();
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        if (!selectedUser) return;
+        handleMenuClose();
+
+        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+
+        try {
+            const res = await fetch(`/api/users/${selectedUser._id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                setToast({ open: true, message: 'User deleted successfully', severity: 'success' });
+                setUsers(users.filter(u => u._id !== selectedUser._id));
+            } else {
+                const error = await res.json();
+                setToast({ open: true, message: error.error || 'Failed to delete user', severity: 'error' });
+            }
+        } catch (error) {
+            setToast({ open: true, message: 'Error deleting user', severity: 'error' });
+        }
+    };
+
+    const handleChangeRole = async () => {
+        if (!selectedUser) return;
+        handleMenuClose();
+
+        const newRole = selectedUser.role === 'admin' ? 'user' : 'admin';
+
+        try {
+            const res = await fetch(`/api/users/${selectedUser._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole }),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                setToast({ open: true, message: `Role updated to ${newRole}`, severity: 'success' });
+                fetchUsers();
+            } else {
+                const error = await res.json();
+                setToast({ open: true, message: error.error || 'Failed to update role', severity: 'error' });
+            }
+        } catch (error) {
+            setToast({ open: true, message: 'Error updating role', severity: 'error' });
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Active': return 'success';
             case 'Blocked': return 'error';
             case 'Pending': return 'warning';
-            default: return 'success'; // Default to success/active for now
+            default: return 'success';
         }
     };
 
@@ -78,8 +212,8 @@ export default function UsersSection() {
 
     // Filter users
     const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -112,6 +246,7 @@ export default function UsersSection() {
                         <Button
                             variant="contained"
                             startIcon={<Plus size={18} />}
+                            onClick={() => setOpenAddDialog(true)}
                             sx={{ bgcolor: 'primary.main', textTransform: 'none', borderRadius: '8px' }}
                         >
                             Add User
@@ -145,7 +280,7 @@ export default function UsersSection() {
                                         <TableCell>
                                             <Box display="flex" alignItems="center" gap={2}>
                                                 <Avatar src={user.avatar} alt={user.name}>
-                                                    {user.name.charAt(0)}
+                                                    {user.name?.charAt(0)}
                                                 </Avatar>
                                                 <Box>
                                                     <Typography variant="subtitle2" fontWeight={600}>
@@ -215,26 +350,86 @@ export default function UsersSection() {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem onClick={handleMenuClose}>
-                    <Eye size={16} style={{ marginRight: 12 }} /> View Profile
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                    <Edit size={16} style={{ marginRight: 12 }} /> Edit User
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                    <Key size={16} style={{ marginRight: 12 }} /> Reset Password
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                    <Shield size={16} style={{ marginRight: 12 }} /> Change Role
+                <MenuItem onClick={handleChangeRole}>
+                    <Shield size={16} style={{ marginRight: 12 }} />
+                    {selectedUser?.role === 'admin' ? 'Demote to User' : 'Promote to Admin'}
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleMenuClose} sx={{ color: 'warning.main' }}>
-                    <Ban size={16} style={{ marginRight: 12 }} /> Block User
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
+                {selectedUser?.status !== 'Blocked' ? (
+                    <MenuItem onClick={() => handleUpdateUserStatus('Blocked')} sx={{ color: 'warning.main' }}>
+                        <Ban size={16} style={{ marginRight: 12 }} /> Block User
+                    </MenuItem>
+                ) : (
+                    <MenuItem onClick={() => handleUpdateUserStatus('Active')} sx={{ color: 'success.main' }}>
+                        <CheckCircle size={16} style={{ marginRight: 12 }} /> Activate User
+                    </MenuItem>
+                )}
+                <MenuItem onClick={handleDeleteUser} sx={{ color: 'error.main' }}>
                     <Trash2 size={16} style={{ marginRight: 12 }} /> Delete User
                 </MenuItem>
             </Menu>
+
+            {/* Add User Dialog */}
+            <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogContent>
+                    <Box component="form" sx={{ mt: 1 }}>
+                        <Stack spacing={2}>
+                            <TextField
+                                fullWidth
+                                label="Full Name"
+                                value={newUser.name}
+                                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                                required
+                            />
+                            <TextField
+                                fullWidth
+                                label="Email Address"
+                                type="email"
+                                value={newUser.email}
+                                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                required
+                            />
+                            <TextField
+                                fullWidth
+                                label="Password"
+                                type="password"
+                                value={newUser.password}
+                                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                required
+                            />
+                            <TextField
+                                fullWidth
+                                label="Phone (Optional)"
+                                value={newUser.phone}
+                                onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                            />
+                        </Stack>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setOpenAddDialog(false)} disabled={actionLoading}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleAddUser}
+                        disabled={actionLoading}
+                    >
+                        {actionLoading ? 'Creating...' : 'Create User'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Notification Toast */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={6000}
+                onClose={() => setToast({ ...toast, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert onClose={() => setToast({ ...toast, open: false })} severity={toast.severity} sx={{ width: '100%' }}>
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Stack>
     );
 }

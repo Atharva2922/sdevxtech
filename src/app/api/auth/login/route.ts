@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import { generateToken } from '@/lib/auth';
+import { createLog } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
     try {
@@ -21,6 +22,13 @@ export async function POST(req: NextRequest) {
         // Find user
         const user = await User.findOne({ email });
         if (!user) {
+            await createLog({
+                action: 'Login Failed',
+                details: `Failed login attempt for email: ${email}`,
+                type: 'warning',
+                user: 'Unknown',
+                source: 'Auth'
+            });
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: 401 }
@@ -30,6 +38,13 @@ export async function POST(req: NextRequest) {
         // Verify password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
+            await createLog({
+                action: 'Login Failed',
+                details: `Invalid password for user: ${user.name} (${email})`,
+                type: 'warning',
+                user: user.name,
+                source: 'Auth'
+            });
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: 401 }
@@ -41,6 +56,15 @@ export async function POST(req: NextRequest) {
             userId: user._id.toString(),
             email: user.email,
             role: user.role
+        });
+
+        // Log successful login
+        await createLog({
+            action: 'User Login',
+            details: `User ${user.name} logged in successfully`,
+            type: 'info',
+            user: user.name,
+            source: 'Auth'
         });
 
         // Check if profile is completed (has at least phone or company filled)

@@ -4,7 +4,7 @@ import Project from '@/models/Project';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-// GET: Fetch user's projects
+// GET: Fetch projects
 export async function GET(req: NextRequest) {
     try {
         await connectDB();
@@ -22,9 +22,18 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
 
-        // Fetch projects for this user
-        const projects = await Project.find({ userId: payload.userId })
-            .sort({ createdAt: -1 });
+        let projects;
+
+        // If admin, fetch all projects (with populated user info)
+        if (payload.role === 'admin') {
+            projects = await Project.find({})
+                .sort({ createdAt: -1 })
+                .populate('userId', 'name email');
+        } else {
+            // Fetch only user's projects
+            projects = await Project.find({ userId: payload.userId })
+                .sort({ createdAt: -1 });
+        }
 
         return NextResponse.json({ projects });
     } catch (error) {
@@ -33,7 +42,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// POST: Create new project (user request)
+// POST: Create new project
 export async function POST(req: NextRequest) {
     try {
         await connectDB();
@@ -52,12 +61,21 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json();
 
-        // Create project for the authenticated user
+        // Check if creating for another user (Admin only)
+        let targetUserId = payload.userId;
+        if (body.userId && body.userId !== payload.userId) {
+            if (payload.role !== 'admin') {
+                return NextResponse.json({ error: 'Forbidden: Cannot create project for another user' }, { status: 403 });
+            }
+            targetUserId = body.userId;
+        }
+
+        // Create project
         const project = await Project.create({
             ...body,
-            userId: payload.userId,
-            status: 'Planning',
-            progress: 0
+            userId: targetUserId,
+            status: body.status || 'Planning',
+            progress: body.progress || 0
         });
 
         return NextResponse.json({ project }, { status: 201 });
