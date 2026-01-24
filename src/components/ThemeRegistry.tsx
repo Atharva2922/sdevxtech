@@ -5,7 +5,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { useMemo } from 'react';
 
-export default function ThemeRegistry({ children, themeColor = '#6366f1' }: { children: React.ReactNode, themeColor?: string }) {
+export default function ThemeRegistry({
+    children,
+    themeColor = '#6366f1',
+    secondaryColor = '#d946ef',
+    backgroundColor = '#ffffff',
+    paperColor = '#f8fafc'
+}: {
+    children: React.ReactNode,
+    themeColor?: string,
+    secondaryColor?: string,
+    backgroundColor?: string,
+    paperColor?: string
+}) {
     const theme = useMemo(() => createTheme({
         palette: {
             mode: 'light',
@@ -13,11 +25,11 @@ export default function ThemeRegistry({ children, themeColor = '#6366f1' }: { ch
                 main: themeColor,
             },
             secondary: {
-                main: '#d946ef',
+                main: secondaryColor,
             },
             background: {
-                default: '#ffffff',
-                paper: '#f8fafc',
+                default: backgroundColor,
+                paper: paperColor,
             },
             text: {
                 primary: '#1a1a1a',
@@ -37,7 +49,7 @@ export default function ThemeRegistry({ children, themeColor = '#6366f1' }: { ch
                 },
             },
         }
-    }), [themeColor]);
+    }), [themeColor, secondaryColor, backgroundColor, paperColor]);
 
     return (
         <AppRouterCacheProvider>

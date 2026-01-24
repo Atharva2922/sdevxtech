@@ -34,11 +34,19 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const themeColor = settings?.themeColor || '#6366f1';
+  const secondaryColor = settings?.secondaryColor || '#d946ef';
+  const backgroundColor = settings?.backgroundColor || '#ffffff';
+  const paperColor = settings?.paperColor || '#f8fafc';
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} antialiased`} style={{ fontFamily: 'var(--font-outfit)' }}>
-        <ThemeRegistry themeColor={themeColor}>
+        <ThemeRegistry
+          themeColor={themeColor}
+          secondaryColor={secondaryColor}
+          backgroundColor={backgroundColor}
+          paperColor={paperColor}
+        >
           {children}
         </ThemeRegistry>
       </body>
