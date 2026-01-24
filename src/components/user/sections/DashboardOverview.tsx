@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Grid, Card, CardContent, LinearProgress, Chip, Stack, Button, CircularProgress } from '@mui/material';
 import { FolderKanban, Clock, CheckCircle, AlertCircle, TrendingUp, MessageSquare } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
 
 interface DashboardOverviewProps {
-    onNavigate?: (section: string) => void;
+    onNavigate?: Dispatch<SetStateAction<string>>;
 }
 
-export default function DashboardOverview({ onNavigate }: DashboardOverviewProps) {
+const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [stats, setStats] = useState<any[]>([
         { label: 'Active Projects', value: '-', icon: FolderKanban, color: '#667eea', change: 'Loading...' },
@@ -255,4 +256,6 @@ export default function DashboardOverview({ onNavigate }: DashboardOverviewProps
             </Paper>
         </Stack>
     );
-}
+};
+
+export default DashboardOverview;
