@@ -12,13 +12,13 @@ export async function GET(req: NextRequest) {
 
         if (error) {
             return NextResponse.redirect(
-                new URL(`/login?error=google_auth_cancelled`, req.url)
+                `${req.nextUrl.origin}/login?error=google_auth_cancelled`
             );
         }
 
         if (!code) {
             return NextResponse.redirect(
-                new URL(`/login?error=no_code_provided`, req.url)
+                `${req.nextUrl.origin}/login?error=no_code_provided`
             );
         }
 
@@ -69,9 +69,12 @@ export async function GET(req: NextRequest) {
 
         // Create response with redirect based on role
         const redirectPath = user.role === 'admin' ? '/admin' : '/user';
-        const response = NextResponse.redirect(
-            new URL(redirectPath, req.url)
-        );
+
+        // Get the origin from the request to ensure we redirect to the same domain
+        const origin = req.nextUrl.origin;
+        const redirectUrl = `${origin}${redirectPath}`;
+
+        const response = NextResponse.redirect(redirectUrl);
 
         // Set token in cookie
         response.cookies.set('auth-token', token, {
@@ -99,7 +102,7 @@ export async function GET(req: NextRequest) {
     } catch (error: unknown) {
         console.error('Google callback error:', error);
         return NextResponse.redirect(
-            new URL(`/login?error=google_auth_failed`, req.url)
+            `${req.nextUrl.origin}/login?error=google_auth_failed`
         );
     }
 }
