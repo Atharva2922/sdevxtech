@@ -45,6 +45,13 @@ export async function POST(req: NextRequest) {
             user = await User.findOne({ email: emailToSearch });
         }
 
+        if (user && user.isDisabled) {
+            return NextResponse.json(
+                { error: 'Account disabled. Please contact support.' },
+                { status: 403 }
+            );
+        }
+
         if (!user) {
             // Create new user
             console.log(`Creating new Firebase user: ${emailToSearch}`);

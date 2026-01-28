@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
+import { adminAuth } from '@/lib/firebase-admin';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
@@ -30,14 +31,52 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
             return NextResponse.json({ error: 'Cannot block your own admin account' }, { status: 400 });
         }
 
+        const { status, role, ...otherUpdates } = body;
+
+        const updateData: any = { ...otherUpdates };
+        if (role) updateData.role = role;
+
+        // Map UI 'status' to DB 'isDisabled'
+        if (status === 'Blocked') {
+            updateData.isDisabled = true;
+        } else if (status === 'Active') {
+            updateData.isDisabled = false;
+        } else if (typeof body.isDisabled === 'boolean') {
+            updateData.isDisabled = body.isDisabled;
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            { ...body },
+            updateData,
             { new: true, runValidators: true }
         ).select('-password');
 
         if (!updatedUser) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // Sync with Firebase Auth if status changed
+        if (typeof updateData.isDisabled === 'boolean') {
+            try {
+                // We need to find the Firebase user by email since we don't strictly store the UID
+                // (though for Google auth/Firebase users it matches but legacy/migrated might vary)
+                if (adminAuth) {
+                    const firebaseUser = await adminAuth.getUserByEmail(updatedUser.email);
+                    if (firebaseUser) {
+                        await adminAuth.updateUser(firebaseUser.uid, {
+                            disabled: updateData.isDisabled
+                        });
+                        console.log(`Synced Firebase user status for ${updatedUser.email}: disabled=${updateData.isDisabled}`);
+                    }
+                } else {
+                    console.warn('Firebase Admin not initialized, cannot sync user status');
+                }
+            } catch (firebaseError: any) {
+                // If user not found in Firebase (e.g. legacy local only?), just log it
+                if (firebaseError.code !== 'auth/user-not-found') {
+                    console.error('Error syncing Firebase status:', firebaseError);
+                }
+            }
         }
 
         return NextResponse.json({ user: updatedUser });
