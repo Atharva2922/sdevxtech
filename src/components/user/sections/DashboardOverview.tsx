@@ -73,10 +73,10 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
         <Stack spacing={3}>
             {/* Welcome Header */}
             <Box>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
+                <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
                     Welcome Back! 👋
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '0.9rem', md: '1rem' } }}>
                     Here&apos;s what&apos;s happening with your projects today
                 </Typography>
             </Box>
@@ -86,7 +86,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
                 <Paper
                     elevation={0}
                     sx={{
-                        p: 3,
+                        p: { xs: 2.5, md: 3 },
                         borderRadius: '16px',
                         background: 'linear-gradient(135deg, #FFF4E5 0%, #FFF9F0 100%)', // Subtle orange/warm background
                         border: '1px solid #FED7AA',
@@ -97,7 +97,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
                         gap: 2
                     }}
                 >
-                    <Box display="flex" gap={2}>
+                    <Box display="flex" gap={2} alignItems="flex-start">
                         <Box
                             sx={{
                                 width: 48,
@@ -113,7 +113,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
                             <AlertCircle color="#F97316" size={24} />
                         </Box>
                         <Box>
-                            <Typography variant="h6" fontWeight="bold" color="#9A3412">
+                            <Typography variant="h6" fontWeight="bold" color="#9A3412" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                                 Complete your profile
                             </Typography>
                             <Typography variant="body2" color="#C2410C">
@@ -124,12 +124,14 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
                     <Button
                         variant="contained"
                         onClick={() => onNavigate?.('profile')}
+                        fullWidth={false}
                         sx={{
                             bgcolor: '#F97316',
                             color: 'white',
                             textTransform: 'none',
                             borderRadius: '50px',
                             px: 3,
+                            width: { xs: '100%', md: 'auto' }, // Full width button on mobile
                             boxShadow: '0 4px 6px -1px rgba(249, 115, 22, 0.2)',
                             '&:hover': {
                                 bgcolor: '#EA580C',
@@ -143,20 +145,20 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user 
             )}
 
             {/* Stats Cards */}
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
                         <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                             <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '16px' }}>
-                                <CardContent>
+                                <CardContent sx={{ p: { xs: 2, md: 3 }, '&:last-child': { pb: { xs: 2, md: 3 } } }}>
                                     <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                                         <Box p={1.5} bgcolor={`${stat.color}15`} borderRadius="12px">
                                             <Icon size={24} color={stat.color} />
                                         </Box>
                                         <TrendingUp size={16} color="#10b981" />
                                     </Box>
-                                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                                    <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.75rem', md: '2.125rem' } }}>
                                         {stat.value}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary" gutterBottom>

@@ -218,7 +218,7 @@ export default function ProfileSection() {
         <Stack spacing={3}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
                         Profile Settings
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -242,20 +242,20 @@ export default function ProfileSection() {
                 </Button>
             </Box>
 
-            <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                <Box display="flex" alignItems="center" gap={3} mb={4}>
+            <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'center', sm: 'center' }} gap={3} mb={4}>
                     <Avatar
                         src={profileData.image}
                         sx={{
-                            width: 80,
-                            height: 80,
+                            width: { xs: 100, sm: 80 },
+                            height: { xs: 100, sm: 80 },
                             bgcolor: 'primary.main',
                             fontSize: 32
                         }}
                     >
                         {!profileData.image && profileData.name.charAt(0).toUpperCase()}
                     </Avatar>
-                    <Box>
+                    <Box textAlign={{ xs: 'center', sm: 'left' }}>
                         <Typography variant="h6" fontWeight="bold">
                             Profile Picture
                         </Typography>

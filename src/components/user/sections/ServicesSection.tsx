@@ -140,7 +140,7 @@ export default function ServicesSection() {
                                         },
                                     }}
                                 >
-                                    <CardContent sx={{ p: 3 }}>
+                                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                                         <Box p={1.5} bgcolor={`${service.color}15`} borderRadius="12px" width="fit-content" mb={2}>
                                             <Icon size={28} color={service.color} />
                                         </Box>

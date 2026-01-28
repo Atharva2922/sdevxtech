@@ -39,15 +39,12 @@ export default function UserSidebar({ currentSection, setCurrentSection, userNam
     return (
         <Box
             sx={{
-                width: 280,
-                height: '100vh',
+                width: '100%',
+                height: '100%',
                 bgcolor: '#ffffff',
                 borderRight: '1px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                position: 'fixed',
-                left: 0,
-                top: 0,
             }}
         >
             {/* Logo/Brand */}

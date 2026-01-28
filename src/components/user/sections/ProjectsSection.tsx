@@ -144,9 +144,9 @@ export default function ProjectsSection() {
                 <Grid container spacing={3}>
                     {projects.map((project) => (
                         <Grid size={{ xs: 12 }} key={project._id}>
-                            <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                                <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
-                                    <Box flex={1}>
+                            <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="start" mb={2}>
+                                    <Box flex={1} width="100%">
                                         <Box display="flex" alignItems="center" gap={2} mb={1}>
                                             <Typography variant="h6" fontWeight="bold">
                                                 {project.name}
@@ -235,7 +235,7 @@ export default function ProjectsSection() {
                                         </Stack>
                                     </Box>
 
-                                    <Stack direction="row" spacing={1} ml={2}>
+                                    <Stack direction={{ xs: 'row', md: 'row' }} spacing={1} ml={{ xs: 0, md: 2 }} mt={{ xs: 2, md: 0 }} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                         <Button
                                             variant="outlined"
                                             size="small"

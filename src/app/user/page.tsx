@@ -144,7 +144,20 @@ export default function UserDashboard() {
             )}
 
             {/* Desktop Sidebar */}
-            {!isMobile && sidebarContent}
+            {!isMobile && (
+                <Box
+                    sx={{
+                        width: 280,
+                        height: '100vh',
+                        position: 'fixed',
+                        left: 0,
+                        top: 0,
+                        zIndex: 1200,
+                    }}
+                >
+                    {sidebarContent}
+                </Box>
+            )}
 
             {/* Mobile Drawer */}
             {isMobile && (
