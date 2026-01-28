@@ -23,22 +23,40 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/register', {
+            // 1. Create User in Firebase
+            const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+            const { auth } = await import('@/lib/firebase');
+
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+            // 2. Update Profile with Name
+            await updateProfile(userCredential.user, {
+                displayName: name
+            });
+
+            // 3. Sync with Backend (MongoDB)
+            const idToken = await userCredential.user.getIdToken();
+            const res = await fetch('/api/auth/firebase-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                body: JSON.stringify({ idToken }),
             });
 
             const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Backend sync failed');
 
-            if (!res.ok) {
-                throw new Error(data.error || 'Registration failed');
+            // 4. Redirect
+            router.push('/user');
+
+        } catch (err: any) {
+            console.error(err);
+            if (err.code === 'auth/email-already-in-use') {
+                setError('This email is already registered. Please log in.');
+            } else if (err.code === 'auth/weak-password') {
+                setError('Password should be at least 6 characters.');
+            } else {
+                setError(err.message || 'Registration failed');
             }
-
-            // Redirect to login page after successful registration
-            router.push('/login?registered=true');
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Registration failed');
         } finally {
             setLoading(false);
         }
