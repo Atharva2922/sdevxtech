@@ -8,6 +8,7 @@ import Services from '@/components/Services';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ColorPicker from '@/components/ColorPicker';
+import PageLoader from '@/components/ui/PageLoader';
 
 export default function Home() {
   const [data, setData] = useState<any>(null);
@@ -37,14 +38,12 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div>Loading...</div>
-      </div>
+      <PageLoader message="Loading SDEVX..." />
     );
   }
 
   if (error || !data) {
-    return <div>Error loading content</div>;
+    return <PageLoader message="Initializing Content..." />;
   }
 
   return (
