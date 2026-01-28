@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
     Box, Paper, Typography, Switch, Divider, Button, Avatar, Chip,
-    List, ListItem, ListItemText, ListItemSecondaryAction, Alert, Snackbar,
+    List, ListItem, ListItemButton, ListItemText, ListItemSecondaryAction, Alert, Snackbar,
     Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField,
     CircularProgress
 } from '@mui/material';
@@ -253,7 +253,7 @@ export default function SettingsSection({ user }: { user?: any }) {
                     }}
                 >
                     <List disablePadding>
-                        <ListItem onClick={handleLogout} button sx={{ '&:hover': { bgcolor: '#fef2f2' } }}>
+                        <ListItemButton onClick={handleLogout} sx={{ '&:hover': { bgcolor: '#fef2f2' } }}>
                             <ListItemIconWrapper color="#ef4444">
                                 <LogOut size={20} />
                             </ListItemIconWrapper>
@@ -262,9 +262,9 @@ export default function SettingsSection({ user }: { user?: any }) {
                                 primaryTypographyProps={{ color: 'error', fontWeight: 500 }}
                                 secondary="Sign out of your account on this device"
                             />
-                        </ListItem>
+                        </ListItemButton>
                         <Divider />
-                        <ListItem button onClick={() => setDeleteAccountOpen(true)} sx={{ '&:hover': { bgcolor: '#fef2f2' } }}>
+                        <ListItemButton onClick={() => setDeleteAccountOpen(true)} sx={{ '&:hover': { bgcolor: '#fef2f2' } }}>
                             <ListItemIconWrapper color="#ef4444">
                                 <AlertTriangle size={20} />
                             </ListItemIconWrapper>
@@ -273,7 +273,7 @@ export default function SettingsSection({ user }: { user?: any }) {
                                 primaryTypographyProps={{ color: 'error', fontWeight: 500 }}
                                 secondary="Permanently delete your account and all data"
                             />
-                        </ListItem>
+                        </ListItemButton>
                     </List>
                 </Paper>
             </Box>
