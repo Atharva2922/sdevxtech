@@ -96,7 +96,10 @@ export default function AdminPage() {
             })
             .then(userData => {
                 if (userData) {
+                    console.log('User data loaded:', userData.user);
                     setUser(userData.user);
+                } else {
+                    console.log('No user data returned from /api/auth/me');
                 }
             })
             .catch(err => console.error('Failed to load user', err));
