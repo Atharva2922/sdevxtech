@@ -7,8 +7,7 @@ import {
     IconButton, Divider, Tabs, Tab
 } from '@mui/material';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
-import OTPLogin from '@/components/auth/OTPLogin';
+import FirebaseAuth from '@/components/auth/FirebaseAuth';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -17,9 +16,9 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
+    const [loginMethod, setLoginMethod] = useState<'firebase' | 'password'>('firebase');
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handlePasswordLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
@@ -43,18 +42,16 @@ export default function LoginPage() {
 
             // Redirect based on role and profile completion
             if (data.user.role === 'admin') {
-                // Admin users: check if profile is complete
                 if (data.isProfileComplete) {
-                    router.push('/admin'); // Go to dashboard if profile is complete
+                    router.push('/admin');
                 } else {
-                    router.push('/admin?section=profile'); // Go to profile if incomplete
+                    router.push('/admin?section=profile');
                 }
             } else {
-                // Regular users: check if profile is complete
                 if (data.isProfileComplete) {
-                    router.push('/user'); // Go to dashboard if profile is complete
+                    router.push('/user');
                 } else {
-                    router.push('/user?section=profile'); // Go to profile if incomplete
+                    router.push('/user?section=profile');
                 }
             }
         } catch (err: unknown) {
@@ -111,42 +108,38 @@ export default function LoginPage() {
                         </Typography>
                     </Box>
 
-                    {/* Error Alert */}
-                    {error && (
-                        <Alert severity="error" sx={{ borderRadius: '12px' }}>
-                            {error}
-                        </Alert>
-                    )}
-
-                    {/* Google Sign-In */}
-                    <GoogleSignInButton />
-
-                    <Divider sx={{ my: 1 }}>
-                        <Typography variant="caption" color="text.secondary">
-                            OR
-                        </Typography>
-                    </Divider>
-
                     {/* Login Method Tabs */}
                     <Tabs
                         value={loginMethod}
                         onChange={(_, newValue) => setLoginMethod(newValue)}
                         centered
+                        variant="fullWidth"
                         sx={{
+                            mb: 1,
                             '& .MuiTab-root': {
                                 textTransform: 'none',
                                 fontWeight: 600,
                             }
                         }}
                     >
+                        <Tab label="Quick Login" value="firebase" />
                         <Tab label="Password" value="password" />
-                        <Tab label="OTP" value="otp" />
                     </Tabs>
+
+                    {/* Firebase Login (Google, Phone, Email Link) */}
+                    {loginMethod === 'firebase' && (
+                        <FirebaseAuth />
+                    )}
 
                     {/* Password Login Form */}
                     {loginMethod === 'password' && (
-                        <form onSubmit={handleLogin}>
+                        <form onSubmit={handlePasswordLogin}>
                             <Stack spacing={2.5}>
+                                {error && (
+                                    <Alert severity="error" sx={{ borderRadius: '12px' }}>
+                                        {error}
+                                    </Alert>
+                                )}
                                 <TextField
                                     fullWidth
                                     label="Email Address"
@@ -224,9 +217,6 @@ export default function LoginPage() {
                             </Stack>
                         </form>
                     )}
-
-                    {/* OTP Login */}
-                    {loginMethod === 'otp' && <OTPLogin initialEmail={email} />}
 
                     {/* Register Link */}
                     <Box textAlign="center">

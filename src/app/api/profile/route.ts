@@ -84,7 +84,7 @@ export async function PUT(req: NextRequest) {
 
         // Get update data from request
         const body = await req.json();
-        const { name, phone, company, address, department, image } = body;
+        const { name, email, phone, company, address, department, image } = body;
 
         console.log('PUT /api/profile - Received update:', { userId: decoded.userId, hasImage: !!image, imageLength: image?.length, bodyImage: body.image });
 
@@ -101,6 +101,7 @@ export async function PUT(req: NextRequest) {
             decoded.userId,
             {
                 name: name.trim(),
+                email: email?.trim() || undefined, // Allow email update
                 phone: phone?.trim() || '',
                 company: company?.trim() || '',
                 address: address?.trim() || '',
@@ -135,10 +136,19 @@ export async function PUT(req: NextRequest) {
                 createdAt: updatedUser.createdAt
             }
         });
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Profile update error:', error);
+
+        // Handle duplicate key error (most likely email)
+        if (error.code === 11000) {
+            return NextResponse.json(
+                { error: 'Email already currently in use by another account.' },
+                { status: 400 }
+            );
+        }
+
         return NextResponse.json(
-            { error: 'Failed to update profile', details: error instanceof Error ? error.message : 'Unknown error' },
+            { error: 'Failed to update profile', details: error.message || 'Unknown error' },
             { status: 500 }
         );
     }

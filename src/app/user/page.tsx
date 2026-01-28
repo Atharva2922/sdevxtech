@@ -25,13 +25,34 @@ export default function UserDashboard() {
     };
 
     useEffect(() => {
-        const loadUser = () => {
-            // Get user from localStorage
+        const loadUser = async () => {
+            // Priority 1: Check localStorage
             const userData = localStorage.getItem('user');
             if (userData) {
-                const parsedUser = JSON.parse(userData);
-                setUser(parsedUser);
-            } else {
+                try {
+                    setUser(JSON.parse(userData));
+                    return; // Found in localStorage, done.
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                    localStorage.removeItem('user');
+                }
+            }
+
+            // Priority 2: Fetch from Session API (if localStorage missing or invalid)
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(data.user);
+                    localStorage.setItem('user', JSON.stringify(data.user)); // Sync back
+                } else {
+                    // Not authenticated
+                    router.push('/login');
+                }
+            } catch (err) {
+                console.error('Failed to fetch user session:', err);
+                // Don't redirect immediately to avoid loops on network error, maybe show error?
+                // But if we can't get user, we probably should redirect or show login button.
                 router.push('/login');
             }
         };
@@ -71,7 +92,7 @@ export default function UserDashboard() {
     const renderSection = () => {
         switch (currentSection) {
             case 'dashboard':
-                return <DashboardOverview onNavigate={setCurrentSection} />;
+                return <DashboardOverview onNavigate={setCurrentSection} user={user} />;
             case 'projects':
                 return <ProjectsSection />;
             case 'services':

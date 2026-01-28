@@ -54,7 +54,7 @@ const UserSchema = new mongoose.Schema({
     // OAuth and OTP fields
     authProvider: {
         type: String,
-        enum: ['local', 'google', 'otp'],
+        enum: ['local', 'google', 'otp', 'firebase'],
         default: 'local'
     },
     googleId: {

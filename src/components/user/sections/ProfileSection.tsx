@@ -76,6 +76,12 @@ export default function ProfileSection() {
             return;
         }
 
+        // Strict Email Validation (Must be @gmail.com)
+        if (!profileData.email.trim() || !profileData.email.endsWith('@gmail.com')) {
+            setToast({ open: true, message: 'Please enter a valid @gmail.com address', severity: 'error' });
+            return;
+        }
+
         setSaving(true);
         try {
             const res = await fetch('/api/profile', {
@@ -84,6 +90,7 @@ export default function ProfileSection() {
                 credentials: 'include',
                 body: JSON.stringify({
                     name: profileData.name,
+                    email: profileData.email,
                     phone: profileData.phone,
                     company: profileData.company,
                     address: profileData.address,
@@ -105,6 +112,9 @@ export default function ProfileSection() {
             if (storedUser) {
                 const user = JSON.parse(storedUser);
                 user.name = data.user.name;
+                user.email = data.user.email; // Sync email
+                user.phone = data.user.phone; // Sync phone
+                user.company = data.user.company; // Sync company
                 user.image = data.user.image;
                 localStorage.setItem('user', JSON.stringify(user));
                 // Dispatch event to update sidebar
@@ -292,7 +302,9 @@ export default function ProfileSection() {
                         <TextField
                             fullWidth
                             value={profileData.email}
-                            disabled
+                            onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                            disabled={!editing}
+                            helperText={editing ? "Must be a @gmail.com address" : ""}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                         />
                     </Grid>

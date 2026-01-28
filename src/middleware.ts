@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
     if ((pathname === '/login' || pathname === '/register') && token) {
         const payload = await verifyToken(token);
         if (payload) {
-            const redirectUrl = payload.role === 'admin' ? '/admin' : '/dashboard';
+            const redirectUrl = payload.role === 'admin' ? '/admin' : '/user';
             return NextResponse.redirect(new URL(redirectUrl, request.url));
         }
     }
@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
 
         // Check role-based access
         if (pathname.startsWith('/admin') && payload.role !== 'admin') {
-            return NextResponse.redirect(new URL('/dashboard', request.url));
+            return NextResponse.redirect(new URL('/user', request.url));
         }
     }
 

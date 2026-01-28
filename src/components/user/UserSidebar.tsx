@@ -72,10 +72,10 @@ export default function UserSidebar({ currentSection, setCurrentSection, userNam
                     </Avatar>
                     <Box>
                         <Typography variant="subtitle2" fontWeight={600}>
-                            {userName || 'User'}
+                            {userName || "Welcome 👋"}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" noWrap>
-                            {userEmail || 'user@example.com'}
+                            {userEmail || "Phone verified"}
                         </Typography>
                     </Box>
                 </Box>

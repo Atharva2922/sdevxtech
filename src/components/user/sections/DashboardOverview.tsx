@@ -6,9 +6,13 @@ import { FolderKanban, Clock, CheckCircle, AlertCircle, TrendingUp, MessageSquar
 
 interface DashboardOverviewProps {
     onNavigate?: Dispatch<SetStateAction<string>>;
+    user?: any; // Accepting user prop
 }
 
-const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate }) => {
+const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate, user }) => {
+    // Check if profile is incomplete (default name or placeholder email)
+    const isProfileIncomplete = user && (String(user.name).startsWith('User ') || String(user.email).endsWith('@phone.firebase'));
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [stats, setStats] = useState<any[]>([
         { label: 'Active Projects', value: '-', icon: FolderKanban, color: '#667eea', change: 'Loading...' },
@@ -76,6 +80,67 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate }) => 
                     Here&apos;s what&apos;s happening with your projects today
                 </Typography>
             </Box>
+
+            {/* Profile Completion Banner */}
+            {isProfileIncomplete && (
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 3,
+                        borderRadius: '16px',
+                        background: 'linear-gradient(135deg, #FFF4E5 0%, #FFF9F0 100%)', // Subtle orange/warm background
+                        border: '1px solid #FED7AA',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        alignItems: { xs: 'flex-start', md: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 2
+                    }}
+                >
+                    <Box display="flex" gap={2}>
+                        <Box
+                            sx={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: '12px',
+                                bgcolor: '#FFEDD5',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                            }}
+                        >
+                            <AlertCircle color="#F97316" size={24} />
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" fontWeight="bold" color="#9A3412">
+                                Complete your profile
+                            </Typography>
+                            <Typography variant="body2" color="#C2410C">
+                                Add your name and email to personalize your experience.
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        onClick={() => onNavigate?.('profile')}
+                        sx={{
+                            bgcolor: '#F97316',
+                            color: 'white',
+                            textTransform: 'none',
+                            borderRadius: '50px',
+                            px: 3,
+                            boxShadow: '0 4px 6px -1px rgba(249, 115, 22, 0.2)',
+                            '&:hover': {
+                                bgcolor: '#EA580C',
+                                boxShadow: '0 10px 15px -3px rgba(249, 115, 22, 0.3)',
+                            }
+                        }}
+                    >
+                        Complete Profile
+                    </Button>
+                </Paper>
+            )}
 
             {/* Stats Cards */}
             <Grid container spacing={3}>
