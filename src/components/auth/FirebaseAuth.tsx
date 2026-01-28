@@ -34,19 +34,17 @@ import { useRouter } from 'next/navigation';
 
 export default function FirebaseAuth() {
     const router = useRouter();
-    const [tab, setTab] = useState(0); // 0: Phone, 1: Email
+    const [tab, setTab] = useState(0); // 0: Password, 1: Email Link (OTP)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [info, setInfo] = useState('');
 
-    // Phone Auth State
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [otp, setOtp] = useState('');
-    const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-    const [otpSent, setOtpSent] = useState(false);
-
-    // Email Auth State
+    // Password Auth State
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    // Email Link Auth State (OTP)
+    const [otpEmail, setOtpEmail] = useState('');
 
     useEffect(() => {
         // Handle Email Link Verification on mount
@@ -87,7 +85,6 @@ export default function FirebaseAuth() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Backend sync failed');
 
-            // Success - store token if needed (though cookie is set)
             // Redirect
             router.push(data.user.role === 'admin' ? '/admin' : '/user');
         } catch (err: any) {
@@ -109,62 +106,25 @@ export default function FirebaseAuth() {
         }
     };
 
-    const setupRecaptcha = () => {
-        if (!(window as any).recaptchaVerifier) {
-            (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                'size': 'invisible',
-                'callback': () => {
-                    // reCAPTCHA solved
-                }
-            });
-        }
-    };
-
-    const handleSendOtp = async (e: React.FormEvent) => {
+    const handlePasswordLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            setupRecaptcha();
-            const appVerifier = (window as any).recaptchaVerifier;
-            const fullPhoneNumber = `+91${phoneNumber}`;
-
-            console.log('Sending OTP to:', fullPhoneNumber);
-
-            const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
-            setConfirmationResult(confirmation);
-            setOtpSent(true);
-            setInfo('OTP sent to your phone.');
+            // Standard Firebase Email/Password Sign In
+            const { signInWithEmailAndPassword } = await import('firebase/auth');
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            await handleBackendSync(userCredential.user);
         } catch (err: any) {
-            console.error('Firebase Phone Auth Error:', err);
-            setError(err.message || 'Failed to send OTP');
-
-            // Only clear if verifier exists
-            if ((window as any).recaptchaVerifier) {
-                try {
-                    (window as any).recaptchaVerifier.clear();
-                    (window as any).recaptchaVerifier = null;
-                } catch (e) {
-                    console.error('Error clearing recaptcha:', e);
-                }
+            console.error('Login Error:', err);
+            let msg = err.message;
+            if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+                msg = 'Invalid email or password.';
+            } else if (err.code === 'auth/too-many-requests') {
+                msg = 'Too many failed attempts. Please try again later.';
             }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerifyOtp = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!confirmationResult) return;
-        setLoading(true);
-        setError('');
-
-        try {
-            const result = await confirmationResult.confirm(otp);
-            await handleBackendSync(result.user);
-        } catch (err: any) {
-            setError(err.message);
+            setError(msg);
             setLoading(false);
         }
     };
@@ -173,18 +133,17 @@ export default function FirebaseAuth() {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setInfo('');
 
         const actionCodeSettings = {
-            // URL you want to redirect back to. The domain (www.example.com) for this
-            // URL must be in the authorized domains list in the Firebase Console.
             url: window.location.href, // Redirect back to this login page
             handleCodeInApp: true,
         };
 
         try {
-            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-            window.localStorage.setItem('emailForSignIn', email);
-            setInfo('Login link sent to your email. Please check your inbox.');
+            await sendSignInLinkToEmail(auth, otpEmail, actionCodeSettings);
+            window.localStorage.setItem('emailForSignIn', otpEmail);
+            setInfo('Login link sent! Check your email inbox (and spam folder) to log in.');
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -193,13 +152,9 @@ export default function FirebaseAuth() {
     };
 
     return (
-        <Box sx={{ maxWidth: 400, mx: 'auto', p: 3, boxShadow: 3, borderRadius: 2, bgcolor: 'background.paper' }}>
-            <Typography variant="h5" align="center" gutterBottom fontWeight="bold">
-                Welcome Back
-            </Typography>
-
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            {info && <Alert severity="info" sx={{ mb: 2 }}>{info}</Alert>}
+        <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
+            {error && <Alert severity="error" sx={{ mb: 2, borderRadius: '12px' }}>{error}</Alert>}
+            {info && <Alert severity="info" sx={{ mb: 2, borderRadius: '12px' }}>{info}</Alert>}
 
             <Button
                 fullWidth
@@ -207,111 +162,99 @@ export default function FirebaseAuth() {
                 startIcon={<GoogleIcon />}
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                sx={{ mb: 3, py: 1.5 }}
+                sx={{ mb: 3, py: 1.5, borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
             >
-                Sign in with Google
+                Continue with Google
             </Button>
 
             <Divider sx={{ mb: 3 }}>OR</Divider>
 
-            <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth" sx={{ mb: 3 }}>
-                <Tab icon={<PhoneIcon />} label="Phone" />
-                <Tab icon={<EmailIcon />} label="Email Link" />
+            <Tabs
+                value={tab}
+                onChange={(_, v) => setTab(v)}
+                variant="fullWidth"
+                sx={{
+                    mb: 3,
+                    '& .MuiTab-root': { textTransform: 'none', fontWeight: 600 }
+                }}
+            >
+                <Tab label="Password" />
+                <Tab label="Get OTP Link" />
             </Tabs>
 
             {tab === 0 && (
-                !otpSent ? (
-                    <form onSubmit={handleSendOtp}>
-                        <TextField
-                            fullWidth
-                            label="Phone Number (10 digits)"
-                            placeholder="9876543210"
-                            value={phoneNumber}
-                            onChange={(e) => {
-                                // Allow only numbers, max 10 digits
-                                const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                setPhoneNumber(val);
-                            }}
-                            disabled={loading}
-                            sx={{ mb: 2 }}
-                            required
-                            slotProps={{
-                                input: {
-                                    startAdornment: <Typography sx={{ mr: 1, color: 'text.secondary' }}>+91</Typography>,
-                                    inputMode: 'numeric',
-                                }
-                            }}
-                        />
-                        <div id="recaptcha-container"></div>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            disabled={loading || phoneNumber.length !== 10}
-                        >
-                            {loading ? <CircularProgress size={24} /> : 'Send OTP'}
-                        </Button>
-                    </form>
-                ) : (
-                    <form onSubmit={handleVerifyOtp}>
-                        <TextField
-                            fullWidth
-                            label="Enter 6-digit Code"
-                            placeholder="123456"
-                            value={otp}
-                            onChange={(e) => {
-                                // Allow only numbers, max 6 digits
-                                const val = e.target.value.replace(/\D/g, '').slice(0, 6);
-                                setOtp(val);
-                            }}
-                            disabled={loading}
-                            sx={{ mb: 2 }}
-                            required
-                            slotProps={{
-                                input: {
-                                    inputMode: 'numeric',
-                                    style: { letterSpacing: '0.5em', fontSize: '1.2rem', textAlign: 'center' }
-                                }
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            disabled={loading || otp.length !== 6}
-                        >
-                            {loading ? <CircularProgress size={24} /> : 'Verify Code'}
-                        </Button>
-                        <Button fullWidth onClick={() => {
-                            setOtpSent(false);
-                            setOtp('');
-                        }} sx={{ mt: 1 }}>
-                            Back
-                        </Button>
-                    </form>
-                )
-            )
-            }
+                <form onSubmit={handlePasswordLogin}>
+                    <TextField
+                        fullWidth
+                        type="email"
+                        label="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        type="password"
+                        label="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                        sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        required
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={loading}
+                        sx={{ py: 1.5, borderRadius: '12px', textTransform: 'none', fontWeight: 600, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
+                    </Button>
+                </form>
+            )}
 
-            {
-                tab === 1 && (
-                    <form onSubmit={handleSendEmailLink}>
-                        <TextField
-                            fullWidth
-                            type="email"
-                            label="Email Address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={loading}
-                            sx={{ mb: 2 }}
-                            required
-                        />
-                        <Button type="submit" fullWidth variant="contained" disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : 'Send Magic Link'}
-                        </Button>
-                    </form>
-                )
-            }
-        </Box >
+            {tab === 1 && (
+                <form onSubmit={handleSendEmailLink}>
+                    <Typography variant="body2" color="text.secondary" mb={2} align="center">
+                        We'll send a magic link to your email. Click it to log in instantly without a password.
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        type="email"
+                        label="Email Address"
+                        value={otpEmail}
+                        onChange={(e) => setOtpEmail(e.target.value)}
+                        disabled={loading}
+                        sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        required
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={loading}
+                        sx={{ py: 1.5, borderRadius: '12px', textTransform: 'none', fontWeight: 600, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Send Login Link'}
+                    </Button>
+                </form>
+            )}
+            {/* Register Link */}
+            <Box textAlign="center" mt={3}>
+                <Typography variant="body2" color="text.secondary">
+                    Don&apos;t have an account?{' '}
+                    <Button
+                        variant="text"
+                        onClick={() => router.push('/register')}
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                    >
+                        Create Account
+                    </Button>
+                </Typography>
+            </Box>
+        </Box>
     );
 }
