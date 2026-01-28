@@ -21,13 +21,13 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        // Fetch messages sent by users (from 'user') or specifically to admin
-        // We can just fetch all messages where 'toUserId' is null (System) OR query populated names.
-        // A better approach for "Client Msgs" is to show threads started by users.
-        const messages = await Message.find({ from: 'user' }) // Filter by sender type 'user'
+        // Fetch ALL messages (both from users and admin replies)
+        // This allows admin to see complete conversation threads
+        const messages = await Message.find({}) // Fetch all messages
             .sort({ createdAt: -1 })
             .populate('fromUserId', 'name email image')
-            .limit(100); // Limit for performance
+            .populate('toUserId', 'name email image')
+            .limit(200); // Increased limit for complete threads
 
         return NextResponse.json({ messages });
 

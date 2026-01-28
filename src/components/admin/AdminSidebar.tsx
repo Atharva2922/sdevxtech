@@ -24,36 +24,17 @@ export const SIDEBAR_ITEMS = [
 interface AdminSidebarProps {
     currentSection: string;
     setCurrentSection: (id: string) => void;
+    userName?: string;
+    userEmail?: string;
+    userImage?: string;
 }
 
-export default function AdminSidebar({ currentSection, setCurrentSection }: AdminSidebarProps) {
-    const [userName, setUserName] = useState('Admin User');
-    const [userEmail, setUserEmail] = useState('admin@sdevx.com');
-    const [userInitials, setUserInitials] = useState('AD');
-    const [userImage, setUserImage] = useState('');
-
-    useEffect(() => {
-        // Get user data from localStorage
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            try {
-                const user = JSON.parse(userData);
-                // Avoid setState in effect warning by doing it conditionally or accepting it's on mount
-                setUserName(user.name || 'Admin User');
-                setUserEmail(user.email || 'admin@sdevx.com');
-                setUserImage(user.image || '');
-
-                // Generate initials from name
-                const nameParts = (user.name || 'Admin User').split(' ');
-                const initials = nameParts.length > 1
-                    ? nameParts[0].charAt(0) + nameParts[1].charAt(0)
-                    : nameParts[0].charAt(0) + (nameParts[0].charAt(1) || '');
-                setUserInitials(initials.toUpperCase());
-            } catch (error: unknown) {
-                console.error('Error parsing user data:', error);
-            }
-        }
-    }, []);
+export default function AdminSidebar({ currentSection, setCurrentSection, userName, userEmail, userImage }: AdminSidebarProps) {
+    // Generate initials from name or default
+    const getInitials = () => {
+        const name = userName || 'Admin';
+        return name.substring(0, 2).toUpperCase();
+    };
 
     return (
         <Box sx={{
@@ -69,7 +50,8 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
             top: 0,
             zIndex: 10
         }}>
-            <Box p={3} display="flex" alignItems="center" gap={2}>
+            {/* Logo */}
+            <Box p={3} display="flex" alignItems="center" gap={2} borderBottom="1px solid var(--card-border)">
                 <Avatar sx={{
                     bgcolor: 'var(--primary-color)',
                     width: 40,
@@ -86,9 +68,42 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
                 </Box>
             </Box>
 
-            <Divider sx={{ mb: 2, opacity: 0.5 }} />
+            {/* User Info (Moved to Top) */}
+            <Box p={2} borderBottom="1px solid var(--card-border)">
+                <Box p={2} borderRadius={3} sx={{
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(217, 70, 239, 0.1) 100%)',
+                    border: '1px solid rgba(99, 102, 241, 0.1)'
+                }}>
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                        <Avatar
+                            src={userImage}
+                            sx={{ width: 32, height: 32, fontSize: '0.8rem', bgcolor: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', flexShrink: 0 }}
+                        >
+                            {!userImage && getInitials()}
+                        </Avatar>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography variant="body2" fontWeight="600" color="text.primary" sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {userName || 'Admin User'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {userEmail || 'admin@sdevx.com'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
 
-            <List component="nav" sx={{ px: 2, flex: 1, overflowY: 'auto' }}>
+            {/* Navigation */}
+            <List component="nav" sx={{ px: 2, flex: 1, overflowY: 'auto', mt: 2 }}>
                 <Typography variant="subtitle2" color="text.secondary" sx={{ px: 2, mb: 1, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Main Menu
                 </Typography>
@@ -132,39 +147,6 @@ export default function AdminSidebar({ currentSection, setCurrentSection }: Admi
                     );
                 })}
             </List>
-
-            <Box p={3}>
-                <Box p={2} borderRadius={3} sx={{
-                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(217, 70, 239, 0.1) 100%)',
-                    border: '1px solid rgba(99, 102, 241, 0.1)'
-                }}>
-                    <Box display="flex" alignItems="center" gap={1.5}>
-                        <Avatar
-                            src={userImage}
-                            sx={{ width: 32, height: 32, fontSize: '0.8rem', bgcolor: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', flexShrink: 0 }}
-                        >
-                            {!userImage && userInitials}
-                        </Avatar>
-                        <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography variant="body2" fontWeight="600" color="text.primary" sx={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}>
-                                {userName}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{
-                                display: 'block',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}>
-                                {userEmail}
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
         </Box>
     );
 }

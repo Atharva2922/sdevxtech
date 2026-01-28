@@ -65,6 +65,7 @@ const CONTENT_TABS = [
 export default function AdminPage() {
     const router = useRouter();
     const [data, setData] = useState<ContentData | null>(null);
+    const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     // Navigation State
@@ -75,6 +76,7 @@ export default function AdminPage() {
     const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
+        // Fetch Content
         fetch('/api/content')
             .then(res => res.json())
             .then(data => {
@@ -85,6 +87,19 @@ export default function AdminPage() {
                 console.error('Failed to load content', err);
                 setLoading(false);
             });
+
+        // Fetch User Data
+        fetch('/api/auth/me')
+            .then(res => {
+                if (res.ok) return res.json();
+                return null;
+            })
+            .then(userData => {
+                if (userData) {
+                    setUser(userData.user);
+                }
+            })
+            .catch(err => console.error('Failed to load user', err));
 
         // Check for query parameters on initial load
         if (typeof window !== 'undefined') {
@@ -97,7 +112,6 @@ export default function AdminPage() {
             }
         }
     }, []);
-
     const handleSave = async () => {
         if (!data) return;
         setSaving(true);
@@ -294,10 +308,17 @@ export default function AdminPage() {
             );
         }
     };
-
     return (
         <AdminLayout
-            sidebar={<AdminSidebar currentSection={currentSection} setCurrentSection={setCurrentSection} />}
+            sidebar={
+                <AdminSidebar
+                    currentSection={currentSection}
+                    setCurrentSection={setCurrentSection}
+                    userName={user?.name}
+                    userEmail={user?.email}
+                    userImage={user?.image}
+                />
+            }
         >
             <AdminHeader
                 title={getHeaderTitle()}

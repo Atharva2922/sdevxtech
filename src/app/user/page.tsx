@@ -10,6 +10,7 @@ import ProjectsSection from '@/components/user/sections/ProjectsSection';
 import ServicesSection from '@/components/user/sections/ServicesSection';
 import MessagesSection from '@/components/user/sections/MessagesSection';
 import ProfileSection from '@/components/user/sections/ProfileSection';
+import SettingsSection from '@/components/user/sections/SettingsSection';
 
 export default function UserDashboard() {
     const router = useRouter();
@@ -104,7 +105,7 @@ export default function UserDashboard() {
             case 'profile':
                 return <ProfileSection />;
             case 'settings':
-                return <Box>Settings Section (Coming Soon)</Box>;
+                return <SettingsSection user={user} />;
             default:
                 return <DashboardOverview />;
         }

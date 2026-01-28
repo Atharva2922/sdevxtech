@@ -15,7 +15,9 @@ interface User {
 
 interface Message {
     _id: string;
+    from: 'user' | 'admin';
     fromUserId: User;
+    toUserId?: User;
     subject: string;
     message: string;
     isRead: boolean;
@@ -65,25 +67,40 @@ export default function AdminMessagesSection() {
         const threadMap = new Map<string, Thread>();
 
         messages.forEach(msg => {
-            // Group by the sender (user). ignoring admin's own replies for grouping logic for now
-            // assuming all messages fetched here are FROM users.
-            // If backend returns mixed (sent & received), logic needs adjustment.
-            // Based on previous code, this fetches "Client Messages", so likely just incoming.
-            const userId = msg.fromUserId?._id;
-            if (!userId) return;
+            // Determine the "other party" in the conversation
+            // If message is from admin, the thread belongs to the recipient (toUserId)
+            // If message is from user, the thread belongs to the sender (fromUserId)
+            let threadUserId: string | null = null;
+            let threadUser: User | null = null;
 
-            if (!threadMap.has(userId)) {
-                threadMap.set(userId, {
-                    user: msg.fromUserId,
+            if (msg.from === 'admin') {
+                // Admin sent this message, so thread belongs to the recipient
+                threadUserId = msg.toUserId?._id || null;
+                threadUser = msg.toUserId || null;
+            } else {
+                // User sent this message, so thread belongs to the sender
+                threadUserId = msg.fromUserId?._id || null;
+                threadUser = msg.fromUserId || null;
+            }
+
+            if (!threadUserId || !threadUser) return;
+
+            if (!threadMap.has(threadUserId)) {
+                threadMap.set(threadUserId, {
+                    user: threadUser,
                     messages: [],
                     lastMessage: msg,
                     unreadCount: 0
                 });
             }
 
-            const thread = threadMap.get(userId)!;
+            const thread = threadMap.get(threadUserId)!;
             thread.messages.push(msg);
-            if (!msg.isRead) thread.unreadCount++;
+
+            // Only count unread messages FROM users (not admin's own messages)
+            if (!msg.isRead && msg.from === 'user') {
+                thread.unreadCount++;
+            }
 
             // Keep track of the very latest message for sorting/preview
             if (new Date(msg.createdAt) > new Date(thread.lastMessage.createdAt)) {
@@ -286,45 +303,67 @@ export default function AdminMessagesSection() {
                         {/* Messages Stream */}
                         <Box sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: '#f8fafc' }}>
                             <Stack spacing={3}>
-                                {activeThread.messages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map((msg, idx) => (
-                                    <Box key={msg._id} display="flex" gap={2} alignItems="flex-start">
-                                        <Avatar
-                                            src={activeThread.user.image}
-                                            sx={{ width: 32, height: 32, mt: 0.5, opacity: 0.8 }}
+                                {activeThread.messages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map((msg) => {
+                                    const isAdminMessage = msg.from === 'admin';
+
+                                    return (
+                                        <Box
+                                            key={msg._id}
+                                            display="flex"
+                                            gap={2}
+                                            alignItems="flex-start"
+                                            flexDirection={isAdminMessage ? 'row-reverse' : 'row'}
                                         >
-                                            {activeThread.user.name[0]}
-                                        </Avatar>
-                                        <Box sx={{ maxWidth: '80%' }}>
-                                            <Box display="flex" alignItems="baseline" gap={1} mb={0.5}>
-                                                <Typography variant="caption" fontWeight="bold" color="text.primary">
-                                                    {activeThread.user.name}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {new Date(msg.createdAt).toLocaleString()}
-                                                </Typography>
-                                            </Box>
-                                            <Paper
-                                                elevation={0}
+                                            <Avatar
+                                                src={isAdminMessage ? undefined : activeThread.user.image}
                                                 sx={{
-                                                    p: 2,
-                                                    borderRadius: '0 12px 12px 12px',
-                                                    bgcolor: '#fff',
-                                                    border: '1px solid #e2e8f0',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                                                    width: 32,
+                                                    height: 32,
+                                                    mt: 0.5,
+                                                    opacity: 0.8,
+                                                    bgcolor: isAdminMessage ? 'primary.main' : undefined
                                                 }}
                                             >
-                                                {msg.subject && (
-                                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                                                        {msg.subject}
+                                                {isAdminMessage ? 'A' : activeThread.user.name[0]}
+                                            </Avatar>
+                                            <Box sx={{ maxWidth: '80%' }}>
+                                                <Box
+                                                    display="flex"
+                                                    alignItems="baseline"
+                                                    gap={1}
+                                                    mb={0.5}
+                                                    flexDirection={isAdminMessage ? 'row-reverse' : 'row'}
+                                                >
+                                                    <Typography variant="caption" fontWeight="bold" color="text.primary">
+                                                        {isAdminMessage ? 'You' : activeThread.user.name}
                                                     </Typography>
-                                                )}
-                                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                                                    {msg.message}
-                                                </Typography>
-                                            </Paper>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {new Date(msg.createdAt).toLocaleString()}
+                                                    </Typography>
+                                                </Box>
+                                                <Paper
+                                                    elevation={0}
+                                                    sx={{
+                                                        p: 2,
+                                                        borderRadius: isAdminMessage ? '12px 0 12px 12px' : '0 12px 12px 12px',
+                                                        bgcolor: isAdminMessage ? '#eef2ff' : '#fff',
+                                                        border: `1px solid ${isAdminMessage ? '#c7d2fe' : '#e2e8f0'}`,
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                                                    }}
+                                                >
+                                                    {msg.subject && (
+                                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                                            {msg.subject}
+                                                        </Typography>
+                                                    )}
+                                                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                                        {msg.message}
+                                                    </Typography>
+                                                </Paper>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                ))}
+                                    );
+                                })}
                             </Stack>
                         </Box>
 

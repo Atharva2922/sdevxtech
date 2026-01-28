@@ -19,12 +19,18 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         }
 
         const payload = await verifyToken(token);
-        if (!payload || payload.role !== 'admin') {
+        if (!payload) {
+            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+
+        const { id } = params;
+
+        // Allow Admin OR Self update
+        if (payload.role !== 'admin' && payload.userId !== id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const body = await req.json();
-        const { id } = params;
 
         // Prevent admin from blocking themselves (optional safety check)
         if (id === payload.userId && body.status === 'Blocked') {
@@ -34,16 +40,19 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         const { status, role, ...otherUpdates } = body;
 
         const updateData: any = { ...otherUpdates };
-        if (role) updateData.role = role;
 
-        // Map UI 'status' to DB 'isDisabled'
-        if (status === 'Blocked') {
-            updateData.isDisabled = true;
-        } else if (status === 'Active') {
-            updateData.isDisabled = false;
-        } else if (typeof body.isDisabled === 'boolean') {
-            updateData.isDisabled = body.isDisabled;
+        // Only Admins can change role or status
+        if (payload.role === 'admin') {
+            if (role) updateData.role = role;
+            if (status === 'Blocked') {
+                updateData.isDisabled = true;
+            } else if (status === 'Active') {
+                updateData.isDisabled = false;
+            } else if (typeof body.isDisabled === 'boolean') {
+                updateData.isDisabled = body.isDisabled;
+            }
         }
+
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
@@ -100,13 +109,20 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
         }
 
         const payload = await verifyToken(token);
-        if (!payload || payload.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        if (!payload) {
+            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
 
         const { id } = params;
 
-        if (id === payload.userId) {
+        // Allow Admin OR Self delete
+        if (payload.role !== 'admin' && payload.userId !== id) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+
+        // Prevent admin from deleting themselves, but allow users to delete themselves
+        if (payload.role === 'admin' && id === payload.userId) {
             return NextResponse.json({ error: 'Cannot delete your own admin account' }, { status: 400 });
         }
 
