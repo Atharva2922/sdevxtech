@@ -95,57 +95,64 @@ export default function Services({ servicesData }: ServicesProps) {
         <section
             id="services"
             ref={sectionRef}
-            className="px-4 md:px-8 bg-gray-50"
+            className="px-4 md:px-0 bg-gray-50"
             style={{
-                paddingTop: '80px',
-                paddingBottom: '80px',
+                paddingTop: '96px',
+                paddingBottom: '96px',
             }}
         >
-            <Container maxWidth="xl">
-                <div className="reveal text-center md:text-left" style={{ marginBottom: '32px' }}>
-                    <span className="block text-xs md:text-sm uppercase tracking-widest mb-2 font-semibold" style={{ color: 'var(--primary-color)' }}>
+            <Container maxWidth="lg">
+                <div className="reveal text-left mb-16">
+                    <span className="block text-xs md:text-sm uppercase tracking-widest mb-3 font-semibold" style={{ color: 'var(--primary-color)' }}>
                         {subHeading}
                     </span>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight" style={{ marginBottom: '16px' }}>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                         {firstPart} <span style={{ color: 'var(--primary-color)' }}>{lastWord}</span>
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: '24px' }}>
+                <div
+                    className="grid gap-8 mt-16"
+                    style={{
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    }}
+                >
                     {items.map((service, index) => {
                         const IconComponent = service.iconComponent;
                         return (
                             <Card
                                 key={index}
-                                className={`reveal ${service.delay}`}
+                                className={`reveal ${service.delay} group`}
                                 sx={{
                                     background: '#ffffff',
                                     border: '1px solid #e2e8f0',
-                                    borderRadius: '16px',
-                                    padding: { xs: '20px', md: '24px' },
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+                                    borderRadius: '24px',
+                                    padding: '32px',
                                     height: '100%',
+                                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
                                     '&:hover': {
-                                        transform: 'translateY(-4px)',
+                                        transform: 'translateY(-8px)',
                                         borderColor: 'var(--primary-color)',
-                                        boxShadow: '0 10px 20px -5px rgb(0 0 0 / 0.1)',
+                                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
                                     },
                                 }}
                             >
-                                <CardContent sx={{ padding: '0 !important' }}>
+                                <CardContent sx={{ padding: '0 !important', flexGrow: 1 }}>
                                     <div
-                                        className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl mb-4 md:mb-6"
+                                        className="w-14 h-14 flex items-center justify-center rounded-2xl mb-6 transition-colors duration-300 group-hover:bg-[var(--primary-color)] group-hover:text-white"
                                         style={{
                                             background: 'rgba(99, 102, 241, 0.1)',
                                             color: 'var(--primary-color)',
                                         }}
                                     >
-                                        <IconComponent sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' } }} />
+                                        <IconComponent sx={{ fontSize: '1.75rem' }} />
                                     </div>
 
-                                    <h3 className="text-xl md:text-2xl font-semibold" style={{ marginBottom: '12px' }}>{service.title}</h3>
-                                    <p className="text-sm md:text-base text-gray-600 leading-relaxed">{service.description}</p>
+                                    <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-900">{service.title}</h3>
+                                    <p className="text-base text-gray-600 leading-relaxed">{service.description}</p>
                                 </CardContent>
                             </Card>
                         );

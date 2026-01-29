@@ -50,6 +50,10 @@ export default function FirebaseAuth() {
     const [otpSent, setOtpSent] = useState(false);
 
     useEffect(() => {
+        // Prefetch dashboard routes for faster navigation after login
+        router.prefetch('/admin');
+        router.prefetch('/user');
+
         // Handle Email Link Verification on mount
         if (isSignInWithEmailLink(auth, window.location.href)) {
             setLoading(true);

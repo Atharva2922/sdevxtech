@@ -83,9 +83,27 @@ export default function UserDashboard() {
     }, []);
 
     if (!user) {
+        // Show Skeleton Loading State instead of plain text
         return (
-            <Box display="flex" alignItems="center" justifyContent="center" minHeight="100vh">
-                Loading...
+            <Box display="flex" minHeight="100vh" bgcolor="#f8fafc">
+                {/* Sidebar Skeleton */}
+                {!isMobile && (
+                    <Box sx={{ width: 280, height: '100vh', position: 'fixed', bgcolor: 'white', borderRight: '1px solid #e2e8f0', p: 3 }}>
+                        <Box sx={{ height: 40, width: 120, bgcolor: 'grey.200', borderRadius: 1, mb: 4 }} />
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <Box key={i} sx={{ height: 48, width: '100%', bgcolor: 'grey.100', borderRadius: 2, mb: 1 }} />
+                        ))}
+                    </Box>
+                )}
+                {/* Content Skeleton */}
+                <Box sx={{ flex: 1, ml: { xs: 0, md: '280px' }, p: 4 }}>
+                    <Box sx={{ height: 32, width: 200, bgcolor: 'grey.200', borderRadius: 1, mb: 4 }} />
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 3 }}>
+                        {[1, 2, 3].map((i) => (
+                            <Box key={i} sx={{ height: 160, bgcolor: 'white', borderRadius: 3, border: '1px solid #e2e8f0' }} />
+                        ))}
+                    </Box>
+                </Box>
             </Box>
         );
     }

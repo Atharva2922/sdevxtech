@@ -6,6 +6,7 @@ import Services from '@/components/Services';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ColorPicker from '@/components/ColorPicker';
+import TrustStrip from '@/components/TrustStrip';
 import connectDB from '@/lib/db';
 import Content from '@/models/Content';
 import fs from 'fs/promises';
@@ -73,6 +74,7 @@ export default async function Home() {
         <Hero heroData={data.hero} />
         <About aboutData={data.about} />
         <Services servicesData={data.services} />
+        <TrustStrip />
         <Contact contactData={data.contact} />
       </main>
       <Footer footerData={data.footer} />

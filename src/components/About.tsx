@@ -34,25 +34,25 @@ export default function About({ aboutData }: { aboutData: any }) {
         <section
             id="about"
             ref={sectionRef}
-            className="px-4 md:px-8"
+            className="px-4 md:px-0 bg-[#f9fafb]"
             style={{
-                paddingTop: '80px',
+                paddingTop: '96px',
                 paddingBottom: '80px',
             }}
         >
-            <Container maxWidth="xl">
-                <div className="reveal text-center md:text-left" style={{ marginBottom: '32px' }}>
-                    <span className="block text-xs md:text-sm uppercase tracking-widest mb-2 font-semibold" style={{ color: 'var(--primary-color)' }}>
+            <Container maxWidth="lg">
+                <div className="reveal text-left mb-12">
+                    <span className="block text-xs md:text-sm uppercase tracking-widest mb-3 font-semibold" style={{ color: 'var(--primary-color)' }}>
                         {aboutData.subHeading}
                     </span>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight" style={{ marginBottom: '16px' }}>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                         {aboutData.heading.replace('Digital Presence', '')} <span style={{ color: 'var(--primary-color)' }}>Digital Presence</span>
                     </h2>
                 </div>
 
-                <div className="reveal max-w-5xl mx-auto md:mx-0" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div className="reveal max-w-2xl space-y-6 text-left">
                     {aboutData.paragraphs.map((para: string, index: number) => (
-                        <p key={index} className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 leading-relaxed">
+                        <p key={index} className="text-lg md:text-xl text-gray-600 leading-relaxed">
                             {para}
                         </p>
                     ))}

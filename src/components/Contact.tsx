@@ -34,43 +34,50 @@ export default function Contact({ contactData }: { contactData: any }) {
         <section
             id="contact"
             ref={sectionRef}
-            className="px-4 md:px-8"
+            className="px-4 md:px-0 bg-white"
             style={{
-                paddingTop: '80px',
-                paddingBottom: '80px',
+                paddingTop: '96px',
+                paddingBottom: '96px',
             }}
         >
-            <Container maxWidth="xl">
+            <Container maxWidth="lg">
                 <div
-                    className="text-center py-12 md:py-16 lg:py-20 px-6 md:px-12 rounded-3xl border reveal max-w-4xl mx-auto"
+                    className="text-center py-20 md:py-28 px-8 md:px-16 rounded-[32px] border reveal max-w-5xl mx-auto relative overflow-hidden group"
                     style={{
-                        background: 'linear-gradient(180deg, rgba(99,102,241,0.05) 0%, transparent 100%)',
-                        borderColor: '#e2e8f0',
+                        background: 'linear-gradient(135deg, rgba(99,102,241,0.03) 0%, rgba(217,70,239,0.03) 100%)',
+                        borderColor: 'rgba(99,102,241,0.1)',
+                        boxShadow: '0 20px 40px -15px rgba(99, 102, 241, 0.1)'
                     }}
                 >
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight" style={{ marginBottom: '16px' }}>
+                    {/* Decorative Blob */}
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2" />
+                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 translate-x-1/2 translate-y-1/2" />
+
+                    <h2 className="relative text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 text-gray-900">
                         {contactData.heading}
                     </h2>
-                    <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed" style={{ marginBottom: '32px' }}>
+                    <p className="relative text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10">
                         {contactData.subtext}
                     </p>
 
                     <Button
                         variant="contained"
                         href={`mailto:${contactData.email}`}
+                        className="relative"
                         sx={{
                             background: 'var(--primary-color)',
                             color: '#ffffff',
                             borderRadius: '50px',
-                            padding: { xs: '12px 32px', md: '14px 40px' },
-                            fontSize: { xs: '1rem', md: '1.1rem' },
+                            padding: { xs: '12px 28px', md: '14px 36px' },
+                            fontSize: { xs: '0.95rem', md: '1rem' },
                             fontWeight: 600,
                             textTransform: 'none',
+                            boxShadow: '0 10px 20px -10px var(--primary-color)',
                             '&:hover': {
                                 background: 'var(--primary-color)',
                                 opacity: 0.9,
                                 transform: 'translateY(-2px)',
-                                boxShadow: '0 10px 20px -5px rgba(99, 102, 241, 0.3)',
+                                boxShadow: '0 20px 30px -10px var(--primary-color)',
                             },
                             transition: 'all 0.3s ease',
                         }}
