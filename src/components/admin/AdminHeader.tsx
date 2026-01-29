@@ -47,6 +47,27 @@ export default function AdminHeader({ title, description, onSave, showSaveButton
         setAnchorEl(null);
     };
 
+    const handleMessageClick = async (messageId: string, userId: string) => {
+        try {
+            // Mark message as read
+            await fetch(`/api/admin/messages/${messageId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isRead: true })
+            });
+
+            // Update local state to remove from unread
+            setRecentMessages(prev => prev.filter(m => m._id !== messageId));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+
+            // Navigate to messages section with the specific user selected
+            handleClose();
+            window.location.href = `/admin?section=messages&userId=${userId}`;
+        } catch (error) {
+            console.error('Failed to mark message as read:', error);
+        }
+    };
+
     const open = Boolean(anchorEl);
 
     return (
@@ -122,7 +143,16 @@ export default function AdminHeader({ title, description, onSave, showSaveButton
                         {recentMessages.length > 0 ? (
                             recentMessages.map((msg) => (
                                 <Box key={msg._id}>
-                                    <ListItem alignItems="flex-start" sx={{ px: 2, py: 1.5 }}>
+                                    <ListItem
+                                        alignItems="flex-start"
+                                        sx={{
+                                            px: 2,
+                                            py: 1.5,
+                                            cursor: 'pointer',
+                                            '&:hover': { bgcolor: '#f8fafc' }
+                                        }}
+                                        onClick={() => handleMessageClick(msg._id, msg.fromUserId?._id)}
+                                    >
                                         <ListItemAvatar>
                                             <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.light' }}>
                                                 <Mail size={16} />

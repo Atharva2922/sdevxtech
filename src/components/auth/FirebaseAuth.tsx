@@ -45,6 +45,9 @@ export default function FirebaseAuth() {
 
     // Email Link Auth State (OTP)
     const [otpEmail, setOtpEmail] = useState('');
+    // OTP Code Auth State
+    const [otpCode, setOtpCode] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
 
     useEffect(() => {
         // Handle Email Link Verification on mount
@@ -151,6 +154,53 @@ export default function FirebaseAuth() {
         }
     };
 
+    const handleRequestOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        setInfo('');
+
+        try {
+            const res = await fetch('/api/auth/request-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: otpEmail }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+
+            setOtpSent(true);
+            setInfo(`OTP sent to ${otpEmail}. Check your inbox.`);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: otpEmail, code: otpCode }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+
+            // Redirect
+            router.push(data.user.role === 'admin' ? '/admin' : '/user');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
             {error && <Alert severity="error" sx={{ mb: 2, borderRadius: '12px' }}>{error}</Alert>}
@@ -179,7 +229,8 @@ export default function FirebaseAuth() {
                 }}
             >
                 <Tab label="Password" />
-                <Tab label="Get OTP Link" />
+                <Tab label="Magic Link" />
+                <Tab label="OTP Code" />
             </Tabs>
 
             {tab === 0 && (
@@ -240,6 +291,60 @@ export default function FirebaseAuth() {
                     >
                         {loading ? <CircularProgress size={24} color="inherit" /> : 'Send Login Link'}
                     </Button>
+                </form>
+            )}
+
+            {tab === 2 && (
+                <form onSubmit={otpSent ? handleVerifyOtp : handleRequestOtp}>
+                    <Typography variant="body2" color="text.secondary" mb={2} align="center">
+                        {otpSent ? 'Enter the code sent to your email.' : 'We will send a code to your email.'}
+                    </Typography>
+
+                    <TextField
+                        fullWidth
+                        type="email"
+                        label="Email Address"
+                        value={otpEmail}
+                        onChange={(e) => setOtpEmail(e.target.value)}
+                        disabled={loading || otpSent}
+                        sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        required
+                    />
+
+                    {otpSent && (
+                        <TextField
+                            fullWidth
+                            type="text"
+                            label="Enter OTP Code"
+                            value={otpCode}
+                            onChange={(e) => setOtpCode(e.target.value)}
+                            disabled={loading}
+                            sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                            required
+                        />
+                    )}
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={loading}
+                        sx={{ py: 1.5, borderRadius: '12px', textTransform: 'none', fontWeight: 600, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : (otpSent ? 'Verify & Login' : 'Send OTP Code')}
+                    </Button>
+
+                    {otpSent && (
+                        <Button
+                            fullWidth
+                            variant="text"
+                            onClick={() => setOtpSent(false)}
+                            disabled={loading}
+                            sx={{ mt: 1, textTransform: 'none', fontWeight: 600 }}
+                        >
+                            Change Email
+                        </Button>
+                    )}
                 </form>
             )}
             {/* Register Link */}

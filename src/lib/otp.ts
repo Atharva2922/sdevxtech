@@ -1,9 +1,26 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 import { Resend } from 'resend';
 
 // Initialize Resend only if API key is available
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+// ==========================================
+// NEW FUNCTIONS (Requested by User)
+// ==========================================
+
+export const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+export const hashOtp = (code: string) => crypto.createHash("sha256").update(code).digest("hex");
+
+export const isOtpExpired = (expiresAt: Date | string | number) => {
+  const expiry = new Date(expiresAt);
+  return Number.isNaN(expiry.getTime()) || expiry.getTime() < Date.now();
+};
+
+// ==========================================
+// LEGACY FUNCTIONS (Preserved for compatibility)
+// ==========================================
 
 // Generate 6-digit OTP
 export function generateOTP(): string {

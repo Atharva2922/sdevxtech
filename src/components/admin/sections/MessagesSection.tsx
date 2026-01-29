@@ -46,6 +46,17 @@ export default function AdminMessagesSection() {
 
     useEffect(() => {
         fetchMessages();
+
+        // Check for userId parameter in URL to auto-select thread
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get('userId');
+            if (userId) {
+                setSelectedThreadId(userId);
+                // Clean up URL parameter
+                window.history.replaceState({}, '', window.location.pathname + '?section=messages');
+            }
+        }
     }, []);
 
     const fetchMessages = async () => {
