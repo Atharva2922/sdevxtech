@@ -1,4 +1,5 @@
 import { Container, Button } from '@mui/material';
+import Image from 'next/image';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Hero({ heroData }: { heroData: any }) {
@@ -15,7 +16,7 @@ export default function Hero({ heroData }: { heroData: any }) {
             />
 
             <Container maxWidth="lg" className="relative z-10">
-                <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
                     {/* Left Content */}
                     <div className="max-w-3xl">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6 fade-in text-left">
@@ -78,22 +79,23 @@ export default function Hero({ heroData }: { heroData: any }) {
                         </div>
                     </div>
 
-                    {/* Right Visual (Abstract) */}
-                    <div className="hidden md:flex justify-center items-center relative fade-in delay-2">
-                        <div className="relative w-full max-w-[500px] aspect-square">
-                            {/* Animated blobs */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" style={{ animationDelay: '2s' }} />
+                    {/* Right Visual - Hero Graphic */}
+                    <div className="flex justify-center items-center relative fade-in delay-2">
+                        <div className="relative w-full max-w-[500px] aspect-square transform hover:scale-105 transition-transform duration-500 ease-out">
+                            {/* Animated blobs behind image */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-purple-100/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-indigo-100/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" style={{ animationDelay: '2s' }} />
 
-                            {/* Geometric Shapes */}
-                            <div
-                                className="absolute inset-0 border border-gray-100 rounded-[2rem] transform rotate-3"
-                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)', backdropFilter: 'blur(5px)' }}
-                            />
-                            <div
-                                className="absolute inset-0 border border-gray-100/50 rounded-[2rem] transform -rotate-2 scale-95 origin-center"
-                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)' }}
-                            />
+                            <div className="relative w-full h-full drop-shadow-2xl">
+                                <Image
+                                    src="/images/hero-graphic.png"
+                                    alt="SDEVX Technology Solutions"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 500px"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
