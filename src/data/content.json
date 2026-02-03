@@ -25,17 +25,28 @@
     ]
   },
   "hero": {
-    "heading": "Crafting Digital",
-    "highlightText": "Atharva",
+    "heading": "THE NEXT",
+    "highlightText": "Excellance",
     "subtext": "Beautiful, functional, and responsive websites tailored to your unique needs.",
+    "topTagline": "VR TECHNOLOGY",
     "primaryButton": {
-      "label": "Start Your Project",
+      "label": "Get Started",
       "href": "/login"
     },
-    "secondaryButton": {
-      "label": "Explore Services",
-      "href": "#services"
-    }
+    "socialLinks": [
+      {
+        "icon": "Twitter",
+        "href": "#"
+      },
+      {
+        "icon": "Instagram",
+        "href": "#"
+      },
+      {
+        "icon": "Language",
+        "href": "#"
+      }
+    ]
   },
   "about": {
     "heading": "Empowering Your Digital Presence",

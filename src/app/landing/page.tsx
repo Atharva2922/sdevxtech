@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import ThemeCarousel from '@/components/ThemeCarousel';
 import About from '@/components/About';
 import Services from '@/components/Services';
 import Contact from '@/components/Contact';
@@ -69,13 +70,12 @@ export default async function Home() {
 
   return (
     <>
-      <Header navItems={data.header?.navItems || []} />
+      <Header navItems={data.header?.navItems} />
       <main>
         <Hero heroData={data.hero} />
+        <ThemeCarousel />
         <About aboutData={data.about} />
         <Services servicesData={data.services} />
-        <TrustStrip />
-        <Contact contactData={data.contact} />
       </main>
       <Footer footerData={data.footer} />
       <ColorPicker />

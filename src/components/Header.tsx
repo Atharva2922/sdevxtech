@@ -1,8 +1,12 @@
 'use client';
 
-import { AppBar, Toolbar, Container, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { AppBar, Toolbar, Container, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText, InputBase, Box, Badge } from '@mui/material';
 import Image from 'next/image';
 import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import { useState } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,28 +30,56 @@ export default function Header({ navItems }: { navItems: any[] }) {
             <AppBar
                 position="fixed"
                 sx={{
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid #e2e8f0',
-                    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+                    background: '#ffffff',
+                    boxShadow: 'none',
+                    borderBottom: 'none',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
                 }}
             >
-                <Container maxWidth="lg">
-                    <Toolbar sx={{ justifyContent: 'space-between', minHeight: { xs: '64px', md: '80px' } }}>
-                        <a href="#" className="block">
-                            <Image
-                                src="/logo-dark.png"
-                                alt="SDEVX Technology"
-                                width={800}
-                                height={200}
-                                className="h-10 md:h-12 w-auto object-contain"
-                                priority
-                            />
-                        </a>
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: '64px', md: '90px' } }}>
+                        {/* 1. Logo Section */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: { xs: 'auto', md: '200px' } }}>
+                            <a href="#" className="block">
+                                <Image
+                                    src="/logo-dark.png"
+                                    alt="SDEVX Technology"
+                                    width={800}
+                                    height={200}
+                                    className="h-8 md:h-10 w-auto object-contain"
+                                    priority
+                                />
+                            </a>
+                        </Box>
 
-                        {/* Desktop Navigation */}
+                        {/* 2. Search Bar (Hidden on mobile) */}
+                        <Box
+                            sx={{
+                                display: { xs: 'none', md: 'flex' },
+                                alignItems: 'center',
+                                backgroundColor: '#fff',
+                                borderRadius: '50px',
+                                border: '1px solid #e2e8f0',
+                                padding: '6px 20px',
+                                width: '300px',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    borderColor: '#cbd5e1',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                },
+                            }}
+                        >
+                            <InputBase
+                                placeholder="I'm looking for..."
+                                sx={{ ml: 1, flex: 1, fontSize: '0.9rem', color: '#64748b' }}
+                            />
+                            <SearchIcon sx={{ color: '#94a3b8' }} />
+                        </Box>
+
+                        {/* 3. Navigation */}
                         <nav className="hidden md:block">
-                            <ul className="flex gap-6 lg:gap-8">
+                            <ul className="flex gap-8 lg:gap-12">
                                 {safeNavItems.map((item) => (
                                     <li key={item.label}>
                                         <a
@@ -56,7 +88,7 @@ export default function Header({ navItems }: { navItems: any[] }) {
                                                 e.preventDefault();
                                                 handleNavClick(item.href);
                                             }}
-                                            className="text-gray-600 hover:text-[var(--primary-color)] font-medium text-sm transition-colors"
+                                            className="text-[#1e293b] hover:text-[var(--primary-color)] font-medium text-[0.95rem] transition-colors"
                                         >
                                             {item.label}
                                         </a>
@@ -64,6 +96,23 @@ export default function Header({ navItems }: { navItems: any[] }) {
                                 ))}
                             </ul>
                         </nav>
+
+                        {/* 4. Icons Section */}
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+                            <IconButton sx={{ color: '#475569' }}>
+                                <Badge color="error" variant="dot">
+                                    <MailOutlineIcon />
+                                </Badge>
+                            </IconButton>
+                            <IconButton sx={{ color: '#475569' }}>
+                                <Badge color="error" variant="dot">
+                                    <NotificationsNoneIcon />
+                                </Badge>
+                            </IconButton>
+                            <IconButton sx={{ color: '#475569' }}>
+                                <PersonOutlineIcon />
+                            </IconButton>
+                        </Box>
 
                         {/* Mobile Menu Button */}
                         <IconButton
@@ -91,7 +140,7 @@ export default function Header({ navItems }: { navItems: any[] }) {
                     '& .MuiDrawer-paper': {
                         background: '#ffffff',
                         borderLeft: '1px solid #e2e8f0',
-                        width: 250,
+                        width: 280,
                     },
                 }}
             >
@@ -108,7 +157,7 @@ export default function Header({ navItems }: { navItems: any[] }) {
                             >
                                 <ListItemText
                                     primary={item.label}
-                                    sx={{ color: '#64748b' }}
+                                    sx={{ color: '#334155' }}
                                 />
                             </ListItemButton>
                         </ListItem>

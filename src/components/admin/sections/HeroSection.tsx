@@ -15,6 +15,16 @@ export default function HeroSection({ data, handleChange }: HeroSectionProps) {
             <Grid size={{ xs: 12 }}>
                 <TextField
                     fullWidth
+                    label="Top Tagline (e.g., VR TECHNOLOGY)"
+                    value={data.topTagline || ''}
+                    onChange={(e) => handleChange('topTagline', e.target.value)}
+                    placeholder="VR TECHNOLOGY"
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'white' } }}
+                />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+                <TextField
+                    fullWidth
                     label="Main Heading"
                     value={data.heading}
                     onChange={(e) => handleChange('heading', e.target.value)}
